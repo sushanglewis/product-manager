@@ -1,0 +1,12 @@
+[project]
+name = "lincoln-record-interview"
+version = "0.1.0"
+description = "CLI wrapper to record Lincoln interviews and trigger process-interview"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "freezegun>=1.5", "pytest-mock>=3.14"]
+
+[project.scripts]
+record-interview = "record_interview.cli:main"
