@@ -6,7 +6,11 @@ requires-python = ">=3.11"
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "freezegun>=1.5", "pytest-mock>=3.14"]
+dev = ["pytest>=8.0", "freezegun>=1.5", "pytest-mock>=3.14", "pytest-cov>=5.0"]
 
 [project.scripts]
 record-interview = "record_interview.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=record_interview --cov-report=term-missing --cov-fail-under=80"
