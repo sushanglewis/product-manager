@@ -1,0 +1,40 @@
+name: OpenSpec Artifact Check
+
+on:
+  push:
+    paths:
+      - "openspec/changes/**"
+  pull_request:
+    paths:
+      - "openspec/changes/**"
+
+jobs:
+  check-openspec:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate OpenSpec artifact structure
+        run: |
+          EXIT=0
+          for change_dir in openspec/changes/*/; do
+            change_name=$(basename "$change_dir")
+            echo "Checking $change_name..."
+            for file in proposal.md design.md tasks.md; do
+              if [ ! -s "$change_dir/$file" ]; then
+                echo "ERROR: $change_dir/$file is missing or empty"
+                EXIT=1
+              fi
+            done
+            if [ ! -d "$change_dir/specs" ] || [ -z "$(ls -A "$change_dir/specs")" ]; then
+              echo "ERROR: $change_dir/specs is missing or empty"
+              EXIT=1
+            fi
+          done
+          exit $EXIT
+
+      - name: Check tasks link to issues
+        run: |
+          # Placeholder: in a real setup, verify each task maps to an issue.
+          echo "Task-to-issue linkage check is performed by the local Lincoln Agent."

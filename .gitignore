@@ -1,0 +1,29 @@
+# Audio and video recordings (large files)
+recordings/*
+!recordings/.gitkeep
+
+# Interview artifacts (can be large or contain sensitive content)
+interviews/*
+!interviews/.gitkeep
+
+# OpenSpec changes are workspace artifacts, generated per change
+openspec/changes/*
+
+# Context state files
+.context/
+
+# Visual companion session artifacts
+.superpowers/
+
+# Obsidian personal workspace settings
+docs/knowledge/.obsidian/workspace.json
+docs/knowledge/.obsidian/graph.json
+
+# macOS
+.DS_Store
+
+# Common build artifacts
+node_modules/
+__pycache__/
+*.pyc
+*.log

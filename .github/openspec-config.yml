@@ -1,0 +1,30 @@
+# Lincoln OpenSpec 配置
+
+# 目标仓库：需求拆分后创建的 GitHub Issues 会进入这个仓库
+repository:
+  owner: your-org
+  name: your-product-repo
+  default_branch: main
+
+# 工作流设置
+workflow:
+  # 是否允许 Agent 自动创建 GitHub Issues
+  auto_create_issues: false
+
+  # 每个 issue 自动添加的标签
+  default_labels:
+    - from-interview
+    - openspec
+
+  # 知识库同步设置
+  knowledge_sync:
+    enabled: true
+    # PR merge 后触发 sync-to-knowledge 的 actor
+    actor: github-actions
+
+# OpenSpec CLI 配置
+openspec:
+  # 默认 profile，安装后可通过 `openspec config profile` 修改
+  profile: default
+  # 是否 telemetry
+  telemetry: false

@@ -1,0 +1,41 @@
+name: Sync to Knowledge Vault
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  sync-knowledge:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract linked issue and PR info
+        id: extract
+        run: |
+          echo "pr_number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+          # Try to extract issue number from PR body
+          ISSUE=$(echo "${{ github.event.pull_request.body }}" | grep -oE '#[0-9]+' | head -1 | tr -d '#')
+          echo "issue_number=${ISSUE:-}" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger Lincoln sync-to-knowledge
+        if: steps.extract.outputs.issue_number != ''
+        run: |
+          echo "Triggering sync-to-knowledge for issue #${{ steps.extract.outputs.issue_number }} and PR #${{ steps.extract.outputs.pr_number }}"
+          # In a real setup, this would invoke Claude Code or a local script.
+          # For now, we create a marker file that the local Agent can pick up.
+          mkdir -p .context
+          echo "pr_number=${{ steps.extract.outputs.pr_number }}" > .context/pr-merged
+          echo "issue_number=${{ steps.extract.outputs.issue_number }}" >> .context/pr-merged
+
+      - name: Commit marker if created
+        run: |
+          if [ -f .context/pr-merged ]; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git add .context/pr-merged
+            git diff --cached --quiet || git commit -m "chore: mark PR #${{ steps.extract.outputs.pr_number }} as merged for knowledge sync"
+            git push
+          fi

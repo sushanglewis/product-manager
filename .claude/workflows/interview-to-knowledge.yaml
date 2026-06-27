@@ -1,0 +1,107 @@
+workflow:
+  name: interview-to-knowledge
+  version: 1.0.0
+  description: 从访谈录音到 GitHub Issues 再到 Obsidian 知识库沉淀的标准工作流
+  loop:
+    engine: everything-claude-code
+    state_file: .context/workflow-state.yaml
+    on_failure: pause_for_human
+    max_retries: 1
+
+  conventions:
+    language: zh-CN
+    artifact_encoding: utf-8
+    timestamp_format: "%Y-%m-%dT%H:%M:%SZ"
+    session_id_pattern: "YYYY-MM-DD-descriptive-name"
+
+  steps:
+    - id: ingest
+      name: 摄入录音
+      description: 将音频访谈转写为文本并生成摘要
+      entry_checks:
+        - file_exists
+        - audio_format_supported
+      action: process-interview
+      artifacts:
+        - interviews/{session}/metadata.json
+        - interviews/{session}/transcript.md
+        - interviews/{session}/summary.md
+        - interviews/{session}/raw-insights.md
+      exit_checks:
+        - transcript_has_timestamps
+        - summary_has_key_topics
+
+    - id: clarify
+      name: 需求澄清
+      description: 基于访谈内容与人类 PM 多轮澄清，形成统一需求文档
+      entry_checks:
+        - summary_ready
+      action: clarify-requirements
+      human_gate: true
+      artifacts:
+        - requirements/{session}/requirements.md
+        - requirements/{session}/user-stories.md
+        - requirements/{session}/prd.md
+      exit_checks:
+        - requirements_has_background_problem_solution_acceptance
+        - human_approved
+
+    - id: propose
+      name: OpenSpec 提案
+      description: 调用 OpenSpec CLI 直接生成变更提案 artifact
+      entry_checks:
+        - requirements_approved
+      action: propose-with-openspec
+      cli_command: "openspec propose {change-name}"
+      input_file: requirements/{session}/requirements.md
+      artifacts:
+        - openspec/changes/{change}/proposal.md
+        - openspec/changes/{change}/specs/
+        - openspec/changes/{change}/design.md
+        - openspec/changes/{change}/tasks.md
+      exit_checks:
+        - openspec_artifact_complete
+        - tasks_extracted
+
+    - id: split
+      name: 拆分到 GitHub
+      description: 将 OpenSpec tasks 拆分为 GitHub Issues
+      entry_checks:
+        - openspec_tasks_ready
+      action: split-to-github
+      artifacts:
+        - .github/linked-issues.yaml
+      exit_checks:
+        - issues_created
+        - tasks_link_back_to_issues
+
+    - id: implement
+      name: 研发实现
+      description: 人类研发团队基于 Issues 开发并提交 PR
+      entry_checks:
+        - issues_ready
+      human_gate: true
+      note: 人类/研发团队完成代码，PR 合并后自动触发下一步
+
+    - id: sync-knowledge
+      name: 同步到知识库
+      description: PR 合并后更新 Obsidian vault，沉淀业务和技术知识
+      trigger: on_pr_merge
+      entry_checks:
+        - pr_merged
+        - issue_exists
+      action: sync-to-knowledge
+      artifacts:
+        - docs/knowledge/01-interviews/{session}.md
+        - docs/knowledge/02-requirements/{requirement-id}.md
+        - docs/knowledge/03-features/{feature-slug}.md
+        - docs/knowledge/04-decisions/{decision-id}.md
+      exit_checks:
+        - feature_doc_has_business_and_technical_sections
+        - feature_doc_has_links
+        - no_conflict_with_existing_knowledge
+
+  gates:
+    human_confirmation_prompt: "请确认当前步骤已完成并可以继续？输入 confirm 继续，或说明需要修改的地方。"
+    on_validation_failure: pause_and_report
+    on_human_rejection: update_artifact_and_revalidate
