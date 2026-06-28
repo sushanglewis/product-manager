@@ -26,7 +26,15 @@ function mockAmplitude(duration: number): number {
 }
 
 export function useRecorder(options: UseRecorderOptions): RecorderController {
-  const { startOnMount = true, ...spawnOptions } = options
+  const {
+    startOnMount = true,
+    workspaceRoot,
+    sessionId,
+    topic,
+    designId,
+    branch,
+    recordInterviewPath,
+  } = options
   const [state, setState] = useState<RecorderState>({
     status: 'idle',
     duration: 0,
@@ -54,7 +62,14 @@ export function useRecorder(options: UseRecorderOptions): RecorderController {
     durationRef.current = 0
 
     try {
-      const recorder = spawnRecorder(spawnOptions)
+      const recorder = spawnRecorder({
+        workspaceRoot,
+        sessionId,
+        topic,
+        designId,
+        branch,
+        recordInterviewPath,
+      })
       recorderRef.current = recorder
 
       recorder.on('ready', () => {
@@ -83,7 +98,7 @@ export function useRecorder(options: UseRecorderOptions): RecorderController {
       const message = error instanceof Error ? error.message : String(error)
       setState(s => ({ ...s, status: 'error', errorMessage: message }))
     }
-  }, [spawnOptions, clearRecordingInterval])
+  }, [workspaceRoot, sessionId, topic, designId, branch, recordInterviewPath, clearRecordingInterval])
 
   const stop = useCallback(async () => {
     const recorder = recorderRef.current
