@@ -1,0 +1,9 @@
+status: pending
+repository: "sushanglewis/product-manager"
+issue_number: "9"
+pr_number: "10"
+pr_url: "https://github.com/sushanglewis/product-manager/pull/10"
+issue_url: "https://github.com/sushanglewis/product-manager/issues/9"
+merged_at: "2026-06-29T08:00:29Z"
+created_at: "2026-06-29T08:00:37Z"
+source: github-actions
