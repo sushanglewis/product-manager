@@ -4,19 +4,21 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { RecordingApp } from '../../src/components/RecordingApp'
 import type { RecorderController, RecorderState } from '../../src/recording/useRecorder'
 
-const baseController: RecorderController = {
-  state: {
-    status: 'recording',
-    duration: 83,
-    amplitude: 0.65,
-    errorMessage: null,
-  },
-  start: vi.fn(),
-  stop: vi.fn(),
-  cancel: vi.fn(),
+const idleState: RecorderState = {
+  status: 'idle',
+  duration: 0,
+  amplitude: 0,
+  errorMessage: null,
 }
 
-let currentController = { ...baseController }
+const recordingState: RecorderState = {
+  status: 'recording',
+  duration: 83,
+  amplitude: 0.65,
+  errorMessage: null,
+}
+
+let currentController: RecorderController
 
 vi.mock('../../src/recording/useRecorder', () => ({
   useRecorder: vi.fn(() => currentController),
@@ -33,10 +35,18 @@ async function tick() {
 describe('RecordingApp', () => {
   beforeEach(() => {
     currentController = {
-      state: { status: 'recording', duration: 83, amplitude: 0.65, errorMessage: null },
-      start: vi.fn(),
-      stop: vi.fn(),
-      cancel: vi.fn(),
+      state: { ...idleState },
+      start: vi.fn(() => {
+        currentController.state = { ...recordingState }
+      }),
+      stop: vi.fn(() => {
+        currentController.state = { status: 'stopped', duration: 83, amplitude: 0, errorMessage: null }
+        return Promise.resolve()
+      }),
+      cancel: vi.fn(() => {
+        currentController.state = { status: 'cancelled', duration: 0, amplitude: 0, errorMessage: null }
+        return Promise.resolve()
+      }),
     }
   })
 
@@ -44,7 +54,7 @@ describe('RecordingApp', () => {
     vi.clearAllMocks()
   })
 
-  test('renders recording screen with session info', () => {
+  test('renders ready screen initially', () => {
     const { lastFrame } = render(
       <RecordingApp
         workspaceRoot="/workspace"
@@ -56,49 +66,14 @@ describe('RecordingApp', () => {
       />,
     )
 
-    expect(lastFrame()).toContain('2026-06-28-test')
-    expect(lastFrame()).toContain('测试访谈')
-    expect(lastFrame()).toContain('Recording')
-    expect(lastFrame()).toContain('01:23')
+    expect(lastFrame()).toContain('Lincoln Recorder')
+    expect(lastFrame()).toContain('Session: 2026-06-28-test')
+    expect(lastFrame()).toContain('Topic: 测试访谈')
+    expect(lastFrame()).toContain('[ Enter ] 开始录音')
   })
 
-  test('shows cancelled screen', () => {
-    currentController.state = { status: 'cancelled', duration: 0, amplitude: 0, errorMessage: null }
-
-    const { lastFrame } = render(
-      <RecordingApp
-        workspaceRoot="/workspace"
-        sessionId="2026-06-28-test"
-        topic=""
-        designId=""
-        branch=""
-        audioMeterStyle="bar"
-      />,
-    )
-
-    expect(lastFrame()).toContain('cancelled')
-  })
-
-  test('shows confirmation screen when stopped', () => {
-    currentController.state = { status: 'stopped', duration: 120, amplitude: 0, errorMessage: null }
-
-    const { lastFrame } = render(
-      <RecordingApp
-        workspaceRoot="/workspace"
-        sessionId="2026-06-28-test"
-        topic=""
-        designId=""
-        branch=""
-        audioMeterStyle="bar"
-      />,
-    )
-
-    expect(lastFrame()).toContain('process-interview')
-    expect(lastFrame()).toContain('Yes')
-  })
-
-  test('calls stop when Enter is pressed', async () => {
-    const { stdin } = render(
+  test('starts recording when Enter is pressed from ready screen', async () => {
+    const { lastFrame, stdin, rerender } = render(
       <RecordingApp
         workspaceRoot="/workspace"
         sessionId="2026-06-28-test"
@@ -110,14 +85,29 @@ describe('RecordingApp', () => {
     )
 
     await tick()
+    expect(lastFrame()).toContain('[ Enter ] 开始录音')
+
     stdin.write('\r')
     await tick()
+    expect(currentController.start).toHaveBeenCalled()
 
-    expect(currentController.stop).toHaveBeenCalled()
+    rerender(
+      <RecordingApp
+        workspaceRoot="/workspace"
+        sessionId="2026-06-28-test"
+        topic=""
+        designId=""
+        branch=""
+        audioMeterStyle="bar"
+      />,
+    )
+    await tick()
+
+    expect(lastFrame()).toContain('Recording')
   })
 
-  test('calls cancel when q is pressed', async () => {
-    const { stdin } = render(
+  test('shows cancelled screen when q is pressed from ready screen', async () => {
+    const { lastFrame, stdin } = render(
       <RecordingApp
         workspaceRoot="/workspace"
         sessionId="2026-06-28-test"
@@ -132,7 +122,96 @@ describe('RecordingApp', () => {
     stdin.write('q')
     await tick()
 
+    expect(lastFrame()).toContain('cancelled')
+    expect(currentController.start).not.toHaveBeenCalled()
+  })
+
+  test('calls stop when Enter is pressed during recording', async () => {
+    const { stdin, rerender } = render(
+      <RecordingApp
+        workspaceRoot="/workspace"
+        sessionId="2026-06-28-test"
+        topic=""
+        designId=""
+        branch=""
+        audioMeterStyle="bar"
+      />,
+    )
+
+    await tick()
+    stdin.write('\r')
+    await tick()
+    expect(currentController.start).toHaveBeenCalled()
+
+    rerender(
+      <RecordingApp
+        workspaceRoot="/workspace"
+        sessionId="2026-06-28-test"
+        topic=""
+        designId=""
+        branch=""
+        audioMeterStyle="bar"
+      />,
+    )
+    await tick()
+
+    stdin.write('\r')
+    await tick()
+
+    expect(currentController.stop).toHaveBeenCalled()
+  })
+
+  test('calls cancel when q is pressed during recording', async () => {
+    const { stdin, rerender } = render(
+      <RecordingApp
+        workspaceRoot="/workspace"
+        sessionId="2026-06-28-test"
+        topic=""
+        designId=""
+        branch=""
+        audioMeterStyle="bar"
+      />,
+    )
+
+    await tick()
+    stdin.write('\r')
+    await tick()
+
+    rerender(
+      <RecordingApp
+        workspaceRoot="/workspace"
+        sessionId="2026-06-28-test"
+        topic=""
+        designId=""
+        branch=""
+        audioMeterStyle="bar"
+      />,
+    )
+    await tick()
+
+    stdin.write('q')
+    await tick()
+
     expect(currentController.cancel).toHaveBeenCalled()
+  })
+
+  test('shows confirmation screen when stopped', async () => {
+    currentController.state = { status: 'stopped', duration: 120, amplitude: 0, errorMessage: null }
+
+    const { lastFrame } = render(
+      <RecordingApp
+        workspaceRoot="/workspace"
+        sessionId="2026-06-28-test"
+        topic=""
+        designId=""
+        branch=""
+        audioMeterStyle="bar"
+      />,
+    )
+
+    await tick()
+    expect(lastFrame()).toContain('process-interview')
+    expect(lastFrame()).toContain('Yes')
   })
 
   test('triggers process-interview when y is pressed on stopped screen', async () => {

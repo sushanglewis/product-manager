@@ -27,7 +27,7 @@ function mockAmplitude(duration: number): number {
 
 export function useRecorder(options: UseRecorderOptions): RecorderController {
   const {
-    startOnMount = true,
+    startOnMount = false,
     workspaceRoot,
     sessionId,
     topic,

@@ -28,12 +28,11 @@ function TestApp() {
     topic: '',
     designId: '',
     branch: '',
-    startOnMount: false,
   })
   return <Text>{state.status}</Text>
 }
 
-function TestAppWithRerender() {
+function TestAppWithRerender({ startOnMount }: { startOnMount?: boolean } = {}) {
   const [count, setCount] = React.useState(0)
   const { state } = useRecorder({
     workspaceRoot: '/workspace',
@@ -41,7 +40,7 @@ function TestAppWithRerender() {
     topic: '',
     designId: '',
     branch: '',
-    startOnMount: true,
+    startOnMount,
   })
 
   return <Text>{state.status}:{count}</Text>
@@ -59,14 +58,29 @@ describe('useRecorder', () => {
     expect(spawnRecorderMock).not.toHaveBeenCalled()
   })
 
-  test('starts recorder once on mount and survives parent re-renders', async () => {
+  test('does not start recorder by default', async () => {
     const { lastFrame, rerender } = render(<TestAppWithRerender />)
+
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(lastFrame()).toContain('idle')
+    expect(spawnRecorderMock).not.toHaveBeenCalled()
+
+    rerender(<TestAppWithRerender />)
+    await new Promise(resolve => setTimeout(resolve, 50))
+
+    expect(spawnRecorderMock).not.toHaveBeenCalled()
+  })
+
+  test('starts recorder once on mount when startOnMount is true', async () => {
+    const { lastFrame, rerender } = render(
+      <TestAppWithRerender startOnMount={true} />
+    )
 
     await new Promise(resolve => setTimeout(resolve, 0))
     expect(lastFrame()).toContain('recording')
     expect(spawnRecorderMock).toHaveBeenCalledTimes(1)
 
-    rerender(<TestAppWithRerender />)
+    rerender(<TestAppWithRerender startOnMount={true} />)
     await new Promise(resolve => setTimeout(resolve, 50))
 
     expect(spawnRecorderMock).toHaveBeenCalledTimes(1)

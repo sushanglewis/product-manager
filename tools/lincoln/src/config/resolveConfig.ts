@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
@@ -37,6 +38,24 @@ function pickFirst(...values: Array<string | undefined>): string {
   return ''
 }
 
+function uniqueSessionId(workspaceRoot: string, now: Date, descriptor?: string): string {
+  const baseSessionId = generateSessionId({ now, descriptor })
+  const recordingPath = join(workspaceRoot, 'recordings', `${baseSessionId}.m4a`)
+  if (!existsSync(recordingPath)) {
+    return baseSessionId
+  }
+
+  for (let counter = 1; counter <= 999; counter += 1) {
+    const candidate = `${baseSessionId}-${String(counter).padStart(3, '0')}`
+    const candidatePath = join(workspaceRoot, 'recordings', `${candidate}.m4a`)
+    if (!existsSync(candidatePath)) {
+      return candidate
+    }
+  }
+
+  return baseSessionId
+}
+
 export function resolveConfig(args: ParsedArgs, options: ResolveOptions = {}): ResolvedConfig {
   const cwd = options.cwd ?? process.cwd()
   const home = options.home ?? homedir()
@@ -50,7 +69,7 @@ export function resolveConfig(args: ParsedArgs, options: ResolveOptions = {}): R
   const branch = pickFirst(args.branch, localConfig.defaultBranch, globalConfig.defaultBranch)
 
   const descriptor = designId || topic || undefined
-  const sessionId = args.sessionId || generateSessionId({ now, descriptor })
+  const sessionId = args.sessionId || uniqueSessionId(cwd, now, descriptor)
 
   return {
     workspaceRoot: cwd,

@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 
 import { CancelledScreen } from './CancelledScreen'
 import { RecordingScreen } from './RecordingScreen'
+import { ReadyScreen } from './ReadyScreen'
 import { StopConfirmation } from './StopConfirmation'
 import { useKeyHandler } from '../hooks/useKeyHandler'
 import { useRecorder } from '../recording/useRecorder'
@@ -17,6 +18,8 @@ export interface RecordingAppProps {
   audioMeterStyle?: 'bar' | 'dot' | 'wave'
   recordInterviewPath?: string
 }
+
+type AppPhase = 'ready' | 'recording' | 'cancelled'
 
 type WorkflowStatus = 'idle' | 'processing' | 'success' | 'error' | 'skipped'
 
@@ -34,30 +37,37 @@ export function RecordingApp({
   audioMeterStyle = 'bar',
   recordInterviewPath,
 }: RecordingAppProps) {
+  const [phase, setPhase] = useState<AppPhase>('ready')
   const [workflow, setWorkflow] = useState<WorkflowState>({ status: 'idle', message: '' })
-  const { state, stop, cancel } = useRecorder({
+  const { state, start, stop, cancel } = useRecorder({
     workspaceRoot,
     sessionId,
     topic,
     designId,
     branch,
     recordInterviewPath,
+    startOnMount: false,
   })
 
   useKeyHandler({
     onStop: () => {
-      if (state.status === 'recording') {
+      if (phase === 'ready') {
+        setPhase('recording')
+        start()
+      } else if (state.status === 'recording') {
         stop()
       }
     },
     onCancel: () => {
-      if (state.status === 'recording') {
+      if (phase === 'ready') {
+        setPhase('cancelled')
+      } else if (state.status === 'recording') {
         cancel()
       }
     },
   })
 
-  if (state.status === 'cancelled') {
+  if (phase === 'cancelled' || state.status === 'cancelled') {
     return <CancelledScreen />
   }
 
@@ -95,6 +105,17 @@ export function RecordingApp({
         <Text bold color="red">Recording error</Text>
         <Text>{state.errorMessage}</Text>
       </Box>
+    )
+  }
+
+  if (phase === 'ready') {
+    return (
+      <ReadyScreen
+        sessionId={sessionId}
+        topic={topic}
+        designId={designId}
+        branch={branch}
+      />
     )
   }
 
