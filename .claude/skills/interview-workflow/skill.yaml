@@ -146,6 +146,10 @@ skill_ecosystem:
     - bug-fix
     - design-spike
     - oss-first-design
+  lincoln:
+    - lincoln-build-codebase-knowledge
+    - lincoln-explore-opensource
+    - lincoln-workflow-router
 
 skill_invocation_rules:
   - In `human_gate: true` stages, sub-skills are for exploration/structuring only.

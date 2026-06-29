@@ -71,6 +71,13 @@ Lincoln 各阶段可调用以下子技能补充方法论：
 | 仅方案预研 | `design-spike` |
 | 强依赖开源方案 | `oss-first-design` |
 
+## 新增自定义技能
+
+| 技能 | 触发条件 | 产物 |
+|------|----------|------|
+| `lincoln-build-codebase-knowledge` | 已有源码但知识库为空 | `docs/knowledge/00-index.md` + feature docs |
+| `lincoln-explore-opensource` | 设计阶段可借鉴开源方案 | `docs/research/{change_name}-oss-options.md` |
+
 ## 工作流步骤
 
 ### 1. process-interview

@@ -21,6 +21,10 @@
    `> **Required sub-skill:** Use superpowers:test-driven-development for all implementation`
 3. 每个任务切片必须包含：失败的测试样例、最小实现命令、重构提示。
 
+## 额外输入
+
+- `docs/research/{change_name}-oss-options.md`（如果存在）：将其中的集成方案作为 TDD 计划的依赖项。
+
 ## 执行指令
 
 1. **读取完整提示文件**: `.claude/skills/interview-workflow/prompts/plan-tdd-development.md`

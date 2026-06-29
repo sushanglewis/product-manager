@@ -16,6 +16,7 @@
 - `superpowers:brainstorming` — 生成设计文档前先探索 2-3 种设计方向，列出 trade-offs。  
   **限制**：PM 未批准前不得调用 `writing-plans` 进入文档实施。
 - `superpowers:writing-plans` — 将设计文档包结构化为可执行计划，明确每个文件的职责与路径。
+- `lincoln-explore-opensource` — 当设计涉及可借鉴开源方案时，在设计文档前先做 OSS 研究。产物：`docs/research/{change_name}-oss-options.md`。
 
 ## human_gate 子技能规则
 
