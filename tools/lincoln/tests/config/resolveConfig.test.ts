@@ -1,4 +1,4 @@
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, test } from 'vitest'
@@ -56,5 +56,17 @@ describe('resolveConfig', () => {
     )
 
     expect(result.noTui).toBe(true)
+  })
+
+  test('appends counter when recording file already exists', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'lincoln-resolve-'))
+    const recordingsDir = join(dir, 'recordings')
+    mkdirSync(recordingsDir)
+    writeFileSync(join(recordingsDir, '2026-06-28-recording.m4a'), '', 'utf-8')
+    writeFileSync(join(recordingsDir, '2026-06-28-recording-001.m4a'), '', 'utf-8')
+
+    const result = resolveConfig({}, { cwd: dir, home: dir, now: new Date('2026-06-28T00:00:00Z') })
+
+    expect(result.sessionId).toBe('2026-06-28-recording-002')
   })
 })

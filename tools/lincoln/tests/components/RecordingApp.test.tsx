@@ -69,7 +69,7 @@ describe('RecordingApp', () => {
     expect(lastFrame()).toContain('Lincoln Recorder')
     expect(lastFrame()).toContain('Session: 2026-06-28-test')
     expect(lastFrame()).toContain('Topic: 测试访谈')
-    expect(lastFrame()).toContain('Press Enter to start recording')
+    expect(lastFrame()).toContain('[ Enter ] 开始录音')
   })
 
   test('starts recording when Enter is pressed from ready screen', async () => {
@@ -85,7 +85,7 @@ describe('RecordingApp', () => {
     )
 
     await tick()
-    expect(lastFrame()).toContain('Press Enter to start recording')
+    expect(lastFrame()).toContain('[ Enter ] 开始录音')
 
     stdin.write('\r')
     await tick()

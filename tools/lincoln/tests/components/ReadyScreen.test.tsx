@@ -47,7 +47,7 @@ describe('ReadyScreen', () => {
       />,
     )
 
-    expect(lastFrame()).toContain('Press Enter to start recording')
-    expect(lastFrame()).toContain('Press q to exit')
+    expect(lastFrame()).toContain('[ Enter ] 开始录音')
+    expect(lastFrame()).toContain('[ Q ] 退出')
   })
 })

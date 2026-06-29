@@ -17,23 +17,19 @@ export function ReadyScreen({ sessionId, topic, designId, branch }: ReadyScreenP
           <Text color="yellow">●</Text>
           <Text color="green">●</Text>
         </Box>
-        <Text bold color="white">
-          Lincoln Recorder
-        </Text>
+        <Text bold color="white">Lincoln Recorder</Text>
       </Box>
 
       <Box flexDirection="column" paddingY={1}>
-        <Text dimColor>Session: {sessionId}</Text>
-        {topic ? <Text dimColor>Topic: {topic}</Text> : null}
-        {designId ? <Text dimColor>Design: {designId}</Text> : null}
-        {branch ? <Text dimColor>Branch: {branch}</Text> : null}
+        <Text color="gray">Session: {sessionId}</Text>
+        {topic ? <Text color="gray">Topic: {topic}</Text> : null}
+        {designId ? <Text color="gray">Design: {designId}</Text> : null}
+        {branch ? <Text color="gray">Branch: {branch}</Text> : null}
       </Box>
 
-      <Box flexDirection="column" alignItems="center" paddingY={1}>
-        <Text bold color="white">
-          Press Enter to start recording
-        </Text>
-        <Text dimColor>Press q to exit</Text>
+      <Box flexDirection="column" alignItems="center" paddingY={1} gap={1}>
+        <Text bold color="green">[ Enter ] 开始录音</Text>
+        <Text color="gray" dimColor>[ Q ] 退出</Text>
       </Box>
     </Box>
   )
