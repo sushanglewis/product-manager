@@ -11,6 +11,9 @@
 
 ## 执行中检查 (During Execution)
 
+- [ ] OpenSpec CLI 已执行并生成产物
+- [ ] 已调用 `superpowers:verification-before-completion` 验证产物
+- [ ] 退出校验全部通过
 - [ ] 读取 `requirements/{session_id}/requirements.md`（需求来源）
 - [ ] 读取 `designs/{design_id}/tdd-plan.md`（TDD 计划输入）
 - [ ] 读取 `designs/{design_id}/design-review.md`（设计评审）

@@ -1,0 +1,89 @@
+workflow:
+  name: oss-first-design
+  version: 1.0.0
+  description: 先探索开源方案，再进行产品设计
+  engine: everything-claude-code
+
+  steps:
+    - id: workflow-router
+      name: 工作流路由
+      action: lincoln-workflow-router
+
+    - id: clarify
+      name: 需求澄清
+      human_gate: true
+      action: clarify-requirements
+      artifacts:
+        - requirements/{session_id}/requirements.md
+      exit_checks:
+        - check: requirements_has_background_problem_solution_acceptance
+        - check: human_approved
+
+    - id: explore-opensource
+      name: 开源方案探索
+      action: lincoln-explore-opensource
+      artifacts:
+        - docs/research/{change_name}-oss-options.md
+      exit_checks:
+        - check: oss_research_complete
+
+    - id: product-design-docs
+      name: 产品设计文档
+      human_gate: true
+      action: draft-product-design
+      artifacts:
+        - designs/{design_id}/design-review.md
+      exit_checks:
+        - check: design_docs_complete
+        - check: design_docs_human_approved
+
+    - id: product-prototype
+      name: 产品原型
+      human_gate: true
+      action: build-product-prototype
+      artifacts:
+        - designs/{design_id}/prototype.pen
+      exit_checks:
+        - check: prototype_artifact_complete
+
+    - id: tdd-development-plan
+      name: TDD 研发计划
+      action: plan-tdd-development
+      artifacts:
+        - designs/{design_id}/tdd-plan.md
+      exit_checks:
+        - check: tdd_plan_complete
+
+    - id: propose
+      name: OpenSpec 提案
+      action: propose-with-openspec
+      cli_command: "openspec propose {change_name}"
+      artifacts:
+        - openspec/changes/{change_name}/
+      exit_checks:
+        - check: openspec_artifact_complete
+        - check: tasks_extracted
+
+    - id: split
+      name: 拆分到 GitHub
+      action: split-to-github
+      artifacts:
+        - .github/linked-issues.yaml
+      exit_checks:
+        - check: issues_created
+        - check: tasks_link_back_to_issues
+
+    - id: implement
+      name: 研发实现
+      human_gate: true
+
+    - id: sync-knowledge
+      name: 同步到知识库
+      trigger: on_pr_merge
+      action: sync-to-knowledge
+      artifacts:
+        - docs/knowledge/03-features/{feature_slug}.md
+      exit_checks:
+        - check: feature_doc_has_business_and_technical_sections
+        - check: feature_doc_has_links
+        - check: no_conflict_with_existing_knowledge

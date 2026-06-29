@@ -54,6 +54,21 @@ Agent 仅在人类明确请求时执行以下操作：
 - PR 合并是人类确认本阶段完成的关键事件
 - PR 合并后，应触发 `sync-knowledge` 阶段
 
+## 按需调用的子技能
+
+Agent 仅在人类明确请求时调用以下子技能：
+
+| 场景 | 调用技能 |
+|------|----------|
+| 需要隔离工作区 | `superpowers:using-git-worktrees` |
+| 需要 Agent 分任务实现 | `superpowers:subagent-driven-development` |
+| 需要 TDD 指导 | `superpowers:test-driven-development` |
+| 遇到 bug/测试失败 | `superpowers:systematic-debugging` |
+| 完成实现后处理 PR | `superpowers:finishing-a-development-branch` |
+| 需要代码审查 | `superpowers:requesting-code-review` |
+| 收到审查意见 | `superpowers:receiving-code-review` |
+| 任何“完成”声明前 | `superpowers:verification-before-completion` |
+
 ## 下一阶段
 
 `sync-knowledge` — 同步到知识库（由 PR 合并自动触发）

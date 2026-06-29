@@ -1,0 +1,49 @@
+workflow:
+  name: design-spike
+  version: 1.0.0
+  description: 仅做方案预研，不进入研发实现
+  engine: everything-claude-code
+
+  steps:
+    - id: workflow-router
+      name: 工作流路由
+      action: lincoln-workflow-router
+
+    - id: clarify
+      name: 需求澄清
+      human_gate: true
+      action: clarify-requirements
+      artifacts:
+        - requirements/{session_id}/requirements.md
+      exit_checks:
+        - check: requirements_has_background_problem_solution_acceptance
+        - check: human_approved
+
+    - id: product-design-docs
+      name: 产品设计文档
+      human_gate: true
+      action: draft-product-design
+      artifacts:
+        - designs/{design_id}/design-review.md
+      exit_checks:
+        - check: design_docs_complete
+        - check: design_docs_human_approved
+
+    - id: product-prototype
+      name: 产品原型
+      human_gate: true
+      action: build-product-prototype
+      artifacts:
+        - designs/{design_id}/prototype.pen
+      exit_checks:
+        - check: prototype_artifact_complete
+
+    - id: sync-knowledge
+      name: 同步到知识库
+      action: sync-to-knowledge
+      artifacts:
+        - docs/knowledge/03-features/{feature_slug}.md
+      exit_checks:
+        - check: feature_doc_has_business_and_technical_sections
+        - check: feature_doc_has_links
+        - check: no_conflict_with_existing_knowledge

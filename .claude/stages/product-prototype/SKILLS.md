@@ -13,6 +13,13 @@
 
 - `claude workflow-continue`
   - 当人类 PM 修改文件后，恢复被暂停的工作流
+- `superpowers:brainstorming` — 在创建 Pencil 原型前提供视觉 companion，探索 UI/UX 选项。  
+  **限制**：必须先询问 PM 是否需要视觉探索，未经同意不得生成原型。
+- `superpowers:using-git-worktrees` — 若原型开发可能污染主分支，调用以创建隔离工作区。
+
+## human_gate 子技能规则
+
+`brainstorming` 的视觉方案必须经 PM 确认，且 `ui-spec.md` 中必须包含 `<!-- prototype-status: approved -->` 或 `[x] PM 已确认原型` 才能进入 `tdd-development-plan`。
 
 ## 校验器使用
 

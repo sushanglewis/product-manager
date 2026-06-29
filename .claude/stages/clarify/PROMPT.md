@@ -14,6 +14,12 @@
 
 基于访谈产物与人类 PM 多轮澄清，产出统一、已确认的需求文档，作为后续阶段的单一事实来源。
 
+## 子技能准备
+
+1. （可选）如果存在外部需求或计划文件，先调用 `gsd-import` 检测冲突。
+2. 调用 `superpowers:brainstorming` 向 PM 提出 2-3 种可能的需求视角/方案，并说明 trade-offs。  
+   **HARD-GATE**：展示方案后必须停下来等待 PM 选择或确认方向，未确认前不得写 `requirements.md`。
+
 ## 执行指令
 
 1. **读取完整提示文件**: `.claude/skills/interview-workflow/prompts/clarify-requirements.md`

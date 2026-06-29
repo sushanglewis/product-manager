@@ -47,6 +47,19 @@
 3. 代码合并前必须通过审查和自动化测试
 4. **Agent 不主动创建或修改代码，仅在人类请求时辅助**
 
+## 可用子技能（人类请求时）
+
+当人类 PM/研发请求时，可调用：
+- `superpowers:using-git-worktrees` — 创建隔离工作区
+- `superpowers:subagent-driven-development` — 分任务实现
+- `superpowers:test-driven-development` — TDD 红/绿/重构
+- `superpowers:systematic-debugging` — 根因排查
+- `superpowers:finishing-a-development-branch` — PR/合并选项
+- `superpowers:requesting-code-review` / `superpowers:receiving-code-review` — 审查
+- `superpowers:verification-before-completion` — 完成前验证
+
+**约束**：未收到明确请求前，Agent 只提供信息，不调用上述技能。
+
 ## 触发 sync-knowledge
 
 PR 合并后，创建以下文件以触发知识同步：

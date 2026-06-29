@@ -11,6 +11,12 @@ Ensure every merged issue leaves behind a complete, linked feature note in `docs
 - `issue_number`: the GitHub Issue number
 - `pr_number`: the merged Pull Request number
 
+## 子技能准备
+
+在执行本 prompt 时：
+1. 调用 `gsd-docs-update` 生成或更新知识文档，确保文档内容与代码库一致。
+2. 若同步失败，调用 `gsd-forensics` 进行失败复盘，找到根因后再继续。
+
 ## Steps
 
 1. Read `.github/openspec-config.yml` for the target repository.

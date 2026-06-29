@@ -14,6 +14,17 @@
 
 基于已确认的产品设计文档、字段规格、UI 规格和 Pencil 原型，生成可执行的测试驱动研发计划，作为产品设计与 OpenSpec 变更提案之间的桥梁。
 
+## 子技能准备
+
+1. 调用 `superpowers:writing-plans` 规划 `tdd-plan.md` 的文件结构与任务切片。
+2. 在计划头部插入：  
+   `> **Required sub-skill:** Use superpowers:test-driven-development for all implementation`
+3. 每个任务切片必须包含：失败的测试样例、最小实现命令、重构提示。
+
+## 额外输入
+
+- `docs/research/{change_name}-oss-options.md`（如果存在）：将其中的集成方案作为 TDD 计划的依赖项。
+
 ## 执行指令
 
 1. **读取完整提示文件**: `.claude/skills/interview-workflow/prompts/plan-tdd-development.md`

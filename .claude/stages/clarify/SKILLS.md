@@ -8,6 +8,18 @@
   - `session_id` (必填): 访谈会话 ID，如 `2026-06-27-stakeholder`
 - **提示文件**: `.claude/skills/interview-workflow/prompts/clarify-requirements.md`
 
+## 辅助子技能
+
+- `superpowers:brainstorming` — 在起草需求前探索 2-3 种需求/方案视角，并列出 trade-offs。  
+  **限制**：仅在人类 PM 批准某一方向后才能继续写 `requirements.md`。
+- `gsd-import` — 当存在外部需求文档或计划时，先调用以检测与项目已有决策的冲突。  
+  用法：`Skill("gsd-import", args="--from <path>")`。
+
+## human_gate 子技能规则
+
+在 `clarify` 阶段，即使使用了 `brainstorming` 也不得绕过人类确认。  
+PM 必须输入 `confirm` 或在 `requirements.md` 中写入 `<!-- status: approved -->` 后才能进入 `product-design-docs`。
+
 ## 辅助技能
 
 - `workflow-continue` — 人类修改文件后恢复被暂停的工作流

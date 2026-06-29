@@ -16,6 +16,8 @@
   - 人类可直接编辑 OpenSpec artifact 后运行此命令
   - Agent 重新读取文件并重新校验
 - `split-to-github` — 下一阶段命令（OpenSpec 提案就绪后执行）
+- `superpowers:verification-before-completion` — OpenSpec CLI 生成产物后，必须运行验证并阅读输出，确认 0 失败才能声明完成。  
+  规则：没有新鲜验证证据，不得声称 `propose` 完成。
 
 ## OpenSpec CLI 使用
 

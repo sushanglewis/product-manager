@@ -11,6 +11,12 @@ Create `designs/<design_id>/` with enough product, data, flow, feasibility, and 
 - `session_id`: the interview session identifier
 - `design_id`: a kebab-case product design identifier
 
+## 子技能准备
+
+在执行本 prompt 前：
+1. 调用 `superpowers:brainstorming` 探索 ≥2 种设计方向并说明 trade-offs，等待 PM 确认。
+2. PM 确认后，调用 `superpowers:writing-plans` 规划文档文件结构与每份文档的职责。
+
 ## Steps
 
 1. Validate that `requirements/<session_id>/requirements.md` is approved.

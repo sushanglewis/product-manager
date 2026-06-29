@@ -31,6 +31,8 @@ import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_PATH = PROJECT_ROOT / ".claude" / "workflows" / "interview-to-knowledge.yaml"
+WORKFLOW_TEMPLATE_DIR = PROJECT_ROOT / ".claude" / "workflows" / "templates"
+DEFAULT_WORKFLOW_PATH = WORKFLOW_PATH
 STATE_PATH = PROJECT_ROOT / ".claude" / "workflow-state.yaml"
 STAGES_DIR = PROJECT_ROOT / ".claude" / "stages"
 VALIDATOR_PATH = (
@@ -81,9 +83,25 @@ def save_yaml(path: Path, data: Any) -> None:
         raise
 
 
-def load_workflow() -> dict[str, Any]:
-    data = load_yaml(WORKFLOW_PATH)
+def resolve_workflow_path(template_name: str | None = None) -> Path:
+    if not template_name:
+        return DEFAULT_WORKFLOW_PATH
+    template_path = WORKFLOW_TEMPLATE_DIR / f"{template_name}.yaml"
+    if not template_path.exists():
+        raise FileNotFoundError(f"Workflow template not found: {template_path}")
+    return template_path
+
+
+def load_workflow(template_name: str | None = None) -> dict[str, Any]:
+    path = resolve_workflow_path(template_name)
+    data = load_yaml(path)
     return data.get("workflow", data)
+
+
+def list_workflow_templates() -> list[str]:
+    if not WORKFLOW_TEMPLATE_DIR.exists():
+        return []
+    return sorted(p.stem for p in WORKFLOW_TEMPLATE_DIR.glob("*.yaml"))
 
 
 def load_state(path: Path | None = None) -> dict[str, Any]:
@@ -173,7 +191,8 @@ def run_validator(
 
 
 def action_load(stage_id: str, state: dict[str, Any]) -> dict[str, Any]:
-    workflow = load_workflow()
+    template_name = state.get("current_run", {}).get("workflow_template")
+    workflow = load_workflow(template_name)
     stage_def = find_stage(workflow, stage_id)
     stage_dir = STAGES_DIR / stage_id
 
@@ -206,7 +225,8 @@ def action_validate(
     phase: str,
     state_file: Path | None = None,
 ) -> int:
-    workflow = load_workflow()
+    template_name = state.get("current_run", {}).get("workflow_template")
+    workflow = load_workflow(template_name)
     stage_def = find_stage(workflow, stage_id)
     checks = stage_def.get(f"{phase}_checks", [])
     variables = state.get("variables", {})
@@ -249,7 +269,8 @@ def action_validate(
 
 
 def action_transition_next(stage_id: str, state: dict[str, Any], state_file: Path | None = None) -> str | None:
-    workflow = load_workflow()
+    template_name = state.get("current_run", {}).get("workflow_template")
+    workflow = load_workflow(template_name)
     next_stage_id = compute_next_stage(workflow, stage_id)
 
     stage_state = state.setdefault("stages", {}).setdefault(stage_id, {})
@@ -288,7 +309,8 @@ def action_transition_next(stage_id: str, state: dict[str, Any], state_file: Pat
 
 def action_recover(state: dict[str, Any], state_file: Path | None = None) -> dict[str, Any]:
     stages = state.get("stages", {})
-    workflow = load_workflow()
+    template_name = state.get("current_run", {}).get("workflow_template")
+    workflow = load_workflow(template_name)
     step_ids = [s["id"] for s in workflow.get("steps", [])]
 
     last_completed = None

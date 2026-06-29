@@ -9,15 +9,21 @@
 - 人类门控：是（`human_gate: true`）
 - 下一 stage：`product-prototype`
 
+## 子技能准备
+
+1. 调用 `superpowers:brainstorming` 提出 2-3 种设计方案及 trade-offs，等待 PM 确认。
+2. PM 确认后，调用 `superpowers:writing-plans` 规划 `designs/{design_id}/` 下的文件结构与每份文档的职责。
+
 ## 执行指令
 
 1. 读取 `.claude/skills/interview-workflow/prompts/draft-product-design.md` 获取完整执行步骤
 2. 确认 `requirements/<session_id>/requirements.md` 已获批准
 3. 读取需求文档包（requirements.md、user-stories.md、prd.md）
-4. 创建 `designs/<design_id>/` 目录并生成 6 份设计文档
-5. 请人类 PM 审阅 `design-review.md`
-6. PM 确认后，在 `design-review.md` 添加 `<!-- status: approved -->`
-7. 提示用户运行：`claude build-product-prototype <session_id> <design_id>`
+4. （可选）如果设计涉及可借鉴开源方案，调用 `lincoln-explore-opensource` 生成 `docs/research/{change_name}-oss-options.md`，并等待 PM 确认后再继续
+5. 创建 `designs/<design_id>/` 目录并生成 6 份设计文档
+6. 请人类 PM 审阅 `design-review.md`
+7. PM 确认后，在 `design-review.md` 添加 `<!-- status: approved -->`
+8. 提示用户运行：`claude build-product-prototype <session_id> <design_id>`
 
 ## 产物清单
 

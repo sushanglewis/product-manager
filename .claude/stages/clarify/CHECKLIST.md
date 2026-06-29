@@ -10,6 +10,9 @@
 
 ## 执行中检查 (During Execution)
 
+- [ ] 外部计划已检查（如存在）：调用 `gsd-import`
+- [ ] 已调用 `superpowers:brainstorming` 探索 ≥2 种需求视角
+- [ ] Brainstorming HARD-GATE 通过：PM 已确认方向
 - [ ] 读取 `interviews/{session_id}/transcript.md`
 - [ ] 读取 `interviews/{session_id}/summary.md`
 - [ ] 读取 `interviews/{session_id}/raw-insights.md`

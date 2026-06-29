@@ -16,6 +16,9 @@
 
 ## 执行中检查 (During Execution)
 
+- [ ] 已调用 `superpowers:writing-plans` 规划文档结构
+- [ ] 计划头部声明了 required sub-skill `superpowers:test-driven-development`
+- [ ] 每个任务切片包含红/绿/重构步骤
 - [ ] 读取 `requirements/{session_id}/requirements.md`（需求来源）
 - [ ] 读取 `designs/{design_id}/design-review.md`（设计评审）
 - [ ] 读取 `designs/{design_id}/scenarios.md`（场景）

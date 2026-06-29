@@ -12,6 +12,17 @@ claude sync-to-knowledge <issue_number> <pr_number>
 - `issue_number`: GitHub Issue 编号
 - `pr_number`: GitHub PR 编号
 
+## 辅助子技能
+
+- `gsd-docs-update` — 生成或更新经代码库验证的知识文档。  
+  用法：`Skill("gsd-docs-update")`（可带 `--force` 或 `--verify-only`）。
+- `gsd-forensics` — 若 `sync-knowledge` 失败，先调用进行失败复盘，再重试。  
+  用法：`Skill("gsd-forensics")`。
+
+## 约束
+
+`gsd-docs-update` 的输出需要与 `docs/knowledge/` 目录结构对齐；生成后检查是否与已有知识冲突。
+
 ## GitHub MCP 使用
 
 本阶段使用 GitHub MCP 获取 Issue 和 PR 信息：

@@ -19,6 +19,48 @@ echo "==> Validate workflow YAML"
 echo "==> Validate skill YAML"
 "$PYTHON" -c "import yaml; yaml.safe_load(open('.claude/skills/interview-workflow/skill.yaml'))"
 
+echo "==> Validate skill dependency manifest"
+"$PYTHON" -c "import yaml; yaml.safe_load(open('.claude/skill-dependencies.yaml'))"
+
+if [ -x "scripts/check-skill-dependencies.sh" ]; then
+    echo "==> Check skill dependencies (non-blocking)"
+    bash scripts/check-skill-dependencies.sh || true
+fi
+
+echo "==> Validate workflow templates"
+"$PYTHON" - "$ROOT" <<'PY'
+import sys
+from pathlib import Path
+import yaml
+
+root = Path(sys.argv[1])
+templates_dir = root / ".claude" / "workflows" / "templates"
+errors = []
+for path in templates_dir.glob("*.yaml"):
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        errors.append(f"{path.name}: YAML parse error: {exc}")
+        continue
+    workflow = data.get("workflow", data)
+    for step in workflow.get("steps", []):
+        stage_id = step.get("id")
+        if not stage_id:
+            errors.append(f"{path.name}: step missing id")
+            continue
+        stage_dir = root / ".claude" / "stages" / stage_id
+        if not stage_dir.exists():
+            errors.append(f"{path.name}: missing stage directory {stage_dir}")
+
+if errors:
+    print("Workflow template issues:")
+    for e in errors:
+        print(f"  - {e}")
+    sys.exit(1)
+
+print("All workflow templates reference valid stage directories.")
+PY
+
 echo "==> Validate Python syntax"
 "$PYTHON" -m py_compile .claude/skills/interview-workflow/validators/validate.py
 
