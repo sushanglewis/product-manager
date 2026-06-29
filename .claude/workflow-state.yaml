@@ -4,99 +4,99 @@ workflow:
   version: 1.0.0
 current_run:
   run_id: test-001
-  branch: pm-workflow-integration-plugin
+  branch: feat-ready-screen
   started_at: '2026-06-27T00:00:00Z'
-  last_updated_at: '2026-06-28T03:25:22Z'
-  current_stage: implement
-  previous_stage: split
-  status: in_progress
+  last_updated_at: '2026-06-29T07:15:00Z'
+  current_stage: null
+  previous_stage: implement
+  status: completed
 stages:
   ingest:
     status: completed
-    started_at: '2026-06-28T01:19:13Z'
-    completed_at: '2026-06-28T01:28:03Z'
-    entry_checks_passed: true
-    entry_checks_run_at: '2026-06-28T01:19:13Z'
-    exit_checks_passed: true
-    exit_checks_run_at: '2026-06-28T01:27:53Z'
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
     human_gate_passed: null
     human_gate_passed_at: null
     artifacts_produced: []
     error_message: null
     retry_count: 0
   clarify:
-    status: completed
-    started_at: '2026-06-28T01:32:23Z'
-    completed_at: '2026-06-28T01:50:25Z'
-    entry_checks_passed: true
-    entry_checks_run_at: '2026-06-28T01:32:23Z'
-    exit_checks_passed: true
-    exit_checks_run_at: '2026-06-28T01:50:14Z'
+    status: validation_failed
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 1
+  product-design-docs:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
     human_gate_passed: null
     human_gate_passed_at: null
     artifacts_produced: []
     error_message: null
     retry_count: 0
-  product-design-docs:
-    status: completed
-    started_at: '2026-06-28T01:53:32Z'
-    completed_at: '2026-06-28T02:08:16Z'
-    entry_checks_passed: true
-    entry_checks_run_at: '2026-06-28T01:53:32Z'
-    exit_checks_passed: true
-    exit_checks_run_at: '2026-06-28T02:07:34Z'
-    human_gate_passed: null
-    human_gate_passed_at: null
-    artifacts_produced: []
-    error_message: null
-    retry_count: 1
   product-prototype:
-    status: completed
-    started_at: '2026-06-28T02:09:19Z'
-    completed_at: '2026-06-28T02:41:08Z'
-    entry_checks_passed: true
-    entry_checks_run_at: '2026-06-28T02:09:19Z'
-    exit_checks_passed: true
-    exit_checks_run_at: '2026-06-28T02:40:10Z'
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
     human_gate_passed: null
     human_gate_passed_at: null
     artifacts_produced: []
     error_message: null
-    retry_count: 1
+    retry_count: 0
   tdd-development-plan:
-    status: completed
-    started_at: '2026-06-28T02:42:09Z'
-    completed_at: '2026-06-28T02:44:36Z'
-    entry_checks_passed: true
-    entry_checks_run_at: '2026-06-28T02:42:10Z'
-    exit_checks_passed: true
-    exit_checks_run_at: '2026-06-28T02:44:27Z'
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
     human_gate_passed: null
     human_gate_passed_at: null
     artifacts_produced: []
     error_message: null
-    retry_count: 1
+    retry_count: 0
   propose:
-    status: completed
-    started_at: '2026-06-28T02:56:00Z'
-    completed_at: '2026-06-28T03:05:37Z'
-    entry_checks_passed: true
-    entry_checks_run_at: '2026-06-28T02:56:00Z'
-    exit_checks_passed: true
-    exit_checks_run_at: '2026-06-28T03:05:04Z'
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
     human_gate_passed: null
     human_gate_passed_at: null
     artifacts_produced: []
     error_message: null
-    retry_count: 1
+    retry_count: 0
   split:
-    status: completed
-    started_at: '2026-06-28T03:09:55Z'
-    completed_at: '2026-06-28T03:25:22Z'
-    entry_checks_passed: true
-    entry_checks_run_at: '2026-06-28T03:09:55Z'
-    exit_checks_passed: true
-    exit_checks_run_at: '2026-06-28T03:25:17Z'
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
     human_gate_passed: null
     human_gate_passed_at: null
     artifacts_produced: []
@@ -104,35 +104,40 @@ stages:
     retry_count: 0
   implement:
     status: not_started
-    started_at: null
+    started_at: '2026-06-28T05:08:07Z'
     completed_at: null
     entry_checks_passed: null
     entry_checks_run_at: null
-    exit_checks_passed: null
-    exit_checks_run_at: null
+    exit_checks_passed: true
+    exit_checks_run_at: '2026-06-28T05:08:07Z'
     human_gate_passed: null
     human_gate_passed_at: null
     artifacts_produced: []
     error_message: null
     retry_count: 0
   sync-knowledge:
-    status: not_started
-    started_at: null
-    completed_at: null
-    entry_checks_passed: null
-    entry_checks_run_at: null
-    exit_checks_passed: null
-    exit_checks_run_at: null
+    status: completed
+    started_at: '2026-06-29T07:10:00Z'
+    completed_at: '2026-06-29T07:15:00Z'
+    entry_checks_passed: true
+    entry_checks_run_at: '2026-06-29T07:10:00Z'
+    exit_checks_passed: true
+    exit_checks_run_at: '2026-06-29T07:15:00Z'
     human_gate_passed: null
     human_gate_passed_at: null
-    artifacts_produced: []
+    artifacts_produced:
+      - docs/knowledge/03-features/lincoln-recording.md
+      - docs/knowledge/01-interviews/2026-06-28-stakeholder-checkout.md
+      - docs/knowledge/02-requirements/REQ-001.md
+      - docs/knowledge/04-decisions/DEC-001.md
+      - docs/knowledge/00-index.md
+      - .github/lincoln-sync-queue/pr-9.yaml
     error_message: null
     retry_count: 0
 variables:
-  session_id: 2026-06-28-stakeholder-checkout
-  design_id: checkout-redesign
-  recording_path: recordings/2026-06-28-stakeholder-checkout.m4a
-  change_name: lincoln-tui-recorder
+  session_id: 2026-06-27-test
+  design_id: null
+  change_name: null
   issue_number: null
   pr_number: null
   feature_slug: null

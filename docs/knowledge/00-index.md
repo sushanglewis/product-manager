@@ -14,10 +14,23 @@
 ## 最近更新
 
 - 2026-06-29 — 新增 [[03-features/lincoln-recording]]：Lincoln Recording TUI 已随 PR #9 合并
+- 2026-06-29 — 新增 [[01-interviews/2026-06-28-stakeholder-checkout]]、[[02-requirements/REQ-001]]、[[04-decisions/DEC-001]]
 
 ## 功能索引
 
 - [[03-features/lincoln-recording]] — Lincoln 访谈录音 TUI
+
+## 访谈索引
+
+- [[01-interviews/2026-06-28-stakeholder-checkout]] — Lincoln TUI 录音工具需求访谈
+
+## 需求索引
+
+- [[02-requirements/REQ-001]] — 录音工具可用性改进
+
+## 决策索引
+
+- [[04-decisions/DEC-001]] — Lincoln TUI 技术方案决策
 
 ## 快速链接
 

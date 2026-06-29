@@ -1,10 +1,15 @@
 ---
 id: FEAT-001
-feature: Lincoln Recording TUI
+title: Lincoln Recording TUI
 status: shipped
 merged_at: 2026-06-29
-issue: "#3 #4 #5 #6"
-pr: "#7 #8 #9"
+source_interview: [[01-interviews/2026-06-28-stakeholder-checkout]]
+source_requirement: [[02-requirements/REQ-001]]
+source_decision: [[04-decisions/DEC-001]]
+source_issue: "3"
+source_pr: "9"
+related_issues: "#3 #4 #5 #6"
+related_prs: "#7 #8 #9"
 ---
 
 # Lincoln Recording TUI
@@ -107,8 +112,11 @@ audio-meter-style: wave
 
 ## 关联
 
-- 访谈：[[01-interviews/2026-06-28-recording]]、[[01-interviews/2026-06-29-recording]]、[[01-interviews/2026-06-29-recording-001]]
+- 访谈：[[01-interviews/2026-06-28-stakeholder-checkout]]
+- 需求：[[02-requirements/REQ-001]]
+- 决策：[[04-decisions/DEC-001]]
 - Issue：#3、#4、#5、#6
 - PR：#7、#8、#9
+- OpenSpec 变更：[[06-references/openspec-changes#lincoln-tui-recorder]]
 - 详细使用说明：[[../../tools/lincoln/README]]
 - 后端说明：[[../../tools/record-interview/README]]
