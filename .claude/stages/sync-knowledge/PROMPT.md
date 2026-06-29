@@ -13,6 +13,11 @@
 - **自动触发**：PR 合并后，`.github/lincoln-sync-queue/pr-{pr_number}.yaml` 被创建
 - **手动触发**：人类运行 `claude sync-to-knowledge <issue_number> <pr_number>`
 
+## 子技能准备
+
+- 调用 `gsd-docs-update` 生成或更新知识文档，确保文档内容与代码库一致。
+- 若同步失败，调用 `gsd-forensics` 进行失败复盘，找到根因后再继续。
+
 ## 快速开始
 
 1. **确认入口条件**：

@@ -10,6 +10,8 @@
 
 ## 执行检查 (Execution Checks)
 
+- [ ] 已按需调用 `superpowers:dispatching-parallel-agents`
+- [ ] 已调用 `superpowers:verification-before-completion` 验证回链
 - [ ] 读取并解析 `openspec/changes/<change_name>/tasks.md`
 - [ ] 为每个任务创建独立的 GitHub Issue
 - [ ] 每个 Issue 包含完整的来源追溯信息

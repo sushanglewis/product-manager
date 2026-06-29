@@ -9,6 +9,11 @@
 - 人类门控：是（`human_gate: true`）
 - 下一 stage：`tdd-development-plan`
 
+## 子技能准备
+
+1. （可选，需 PM 同意）调用 `superpowers:brainstorming` 的视觉 companion 探索 UI/UX 选项。
+2. （可选）若原型需要在独立分支/工作区开发，调用 `superpowers:using-git-worktrees`。
+
 ## 执行指令
 
 1. 读取 `.claude/skills/interview-workflow/prompts/build-product-prototype.md` 获取完整执行步骤

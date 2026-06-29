@@ -59,6 +59,12 @@
 
 > 注意：`.pen` 文件只能通过 Pencil 工具处理，不使用普通文件读取或编辑。
 
+## 辅助子技能
+
+- `superpowers:writing-plans` — 将 `tdd-plan.md` 写成 bite-sized 可执行计划，明确文件路径、命令与验收标准。
+- `superpowers:test-driven-development` — 强制每个任务遵循红/绿/重构：先写失败测试，再写最小程序，再重构。  
+  要求：计划头部必须声明 `> **Required sub-skill:** Use superpowers:test-driven-development for all implementation`。
+
 ## 产物规范
 
 `tdd-plan.md` 必须包含以下章节：

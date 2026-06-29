@@ -11,6 +11,8 @@
 
 ## 执行检查 (Execution Checks)
 
+- [ ] 已调用 `gsd-docs-update` 生成/更新知识文档
+- [ ] 若失败，已调用 `gsd-forensics` 诊断
 - [ ] 读取 `.github/openspec-config.yml` 获取目标仓库
 - [ ] 使用 GitHub MCP 获取 Issue 详情和 PR 详情
 - [ ] 从 Issue 正文找到关联的需求和 OpenSpec 变更

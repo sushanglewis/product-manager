@@ -18,7 +18,7 @@
 
 1. **读取完整提示文件**: `.claude/skills/interview-workflow/prompts/propose-with-openspec.md`
    - 该文件包含详细的 OpenSpec CLI 调用步骤和 artifact 验证规则
-   - 按照提示文件中的步骤 1-8 执行
+   - 按照提示文件中的步骤 1-9 执行
 
 2. **阶段状态感知**:
    - 检查 `.claude/workflow-state.yaml` 中的 `stages.propose` 状态
@@ -49,9 +49,10 @@
    - 优先：`openspec propose {change_name} --from designs/{design_id}/tdd-plan.md`
    - 次选：`openspec propose {change_name}` 并 pipe TDD 计划内容
    - 失败时读取 `openspec propose --help` 并适配
-5. 验证生成的 artifact 文件存在且非空
-6. 验证 artifact 引用 TDD 计划、Pencil 原型和核心设计文档
-7. 运行退出校验器验证 artifact 完整性和任务提取
+5. 调用 `superpowers:verification-before-completion` 验证 artifact：先运行退出校验并阅读输出，确认 0 失败
+6. 验证生成的 artifact 文件存在且非空
+7. 验证 artifact 引用 TDD 计划、Pencil 原型和核心设计文档
+8. 运行退出校验器验证 artifact 完整性和任务提取
 
 ## 完成后操作
 

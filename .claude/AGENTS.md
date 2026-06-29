@@ -29,6 +29,28 @@ Agent 进入会话后，应首先确认当前分支和阶段：
 4. **知识库双轨维护**：每个合并的 issue 必须同时沉淀业务知识和技术知识到 Obsidian vault。
 5. **不修改原始录音**：`recordings/` 目录中的文件只读，永远不在原地修改。
 6. **Pencil 原型受控处理**：`.pen` 文件只能通过 Pencil 应用或 Pencil 工具处理，不用普通文件读取或编辑其内容。
+7. **技能感知执行**：始终调用最适合当前阶段方法论需求的子技能，但子技能不能替代 `human_gate`。
+
+## 集成技能生态
+
+Lincoln 各阶段可调用以下子技能补充方法论：
+
+| 阶段 | 调用技能 | 用途 |
+|------|----------|------|
+| clarify | `superpowers:brainstorming`, `gsd-import` | 方案探索、外部计划导入 |
+| product-design-docs | `superpowers:brainstorming`, `superpowers:writing-plans` | 设计探索与文档结构化 |
+| product-prototype | `superpowers:brainstorming`, `superpowers:using-git-worktrees` | UI 探索、原型隔离 |
+| tdd-development-plan | `superpowers:writing-plans`, `superpowers:test-driven-development` | 计划拆分、TDD 约束 |
+| propose | `superpowers:verification-before-completion` | 产物验证 |
+| split | `superpowers:dispatching-parallel-agents`, `superpowers:verification-before-completion` | 并行建 Issue、回链验证 |
+| implement | `superpowers:using-git-worktrees`, `superpowers:subagent-driven-development`, `superpowers:test-driven-development`, `superpowers:systematic-debugging`, `superpowers:finishing-a-development-branch`, `superpowers:requesting-code-review`, `superpowers:receiving-code-review`, `superpowers:verification-before-completion` | 按需辅助人类研发 |
+| sync-knowledge | `gsd-docs-update`, `gsd-forensics` | 文档生成与失败诊断 |
+
+### 调用规则
+
+1. `human_gate: true` 阶段，子技能仅用于探索或结构化，**不得替代人类确认**。
+2. 任何实施类技能（如 `subagent-driven-development`、`executing-plans`）必须在 PM 明确批准后才能调用。
+3. 调用 GSD 技能时使用 `Skill` 工具，技能名即上表所示；不使用 Codex 的 `$gsd-*` 语法。
 
 ## 工作流步骤
 

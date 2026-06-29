@@ -12,6 +12,11 @@ claude split-to-github <session_id> <change_name>
 - `session_id`: 访谈会话 ID
 - `change_name`: OpenSpec 变更名称
 
+## 辅助子技能
+
+- `superpowers:dispatching-parallel-agents` — 当需要创建 3 个以上相互独立的 GitHub Issues 时，可并行派发独立 agent 加速。
+- `superpowers:verification-before-completion` — Issue 创建后必须验证：所有 issue 都能在 `requirements.md` 中通过 `#<number>` 回链。
+
 ## GitHub MCP 使用
 
 本阶段使用 GitHub MCP 进行 Issue 操作：

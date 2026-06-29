@@ -10,6 +10,13 @@ Produce a clear, agreed-upon `requirements/<session-id>/requirements.md` that se
 
 - `session_id`: the interview session identifier
 
+## 子技能准备
+
+在执行本 prompt 前：
+- 若存在外部需求/计划文件，先调用 `gsd-import` 进行冲突检测。
+- 调用 `superpowers:brainstorming` 与 PM 一起探索 2-3 种可能的需求视角，列出 trade-offs。  
+  **在 PM 明确选择方向前，禁止继续生成需求文档。**
+
 ## Steps
 
 1. Read `interviews/<session-id>/transcript.md`, `summary.md`, and `raw-insights.md`.

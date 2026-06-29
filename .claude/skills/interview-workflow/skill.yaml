@@ -111,3 +111,29 @@ references:
   agents_guide: .claude/AGENTS.md
   workflow_yaml: .claude/workflows/interview-to-knowledge.yaml
   openspec: https://github.com/Fission-AI/openspec
+
+skill_ecosystem:
+  superpowers:
+    - superpowers:brainstorming
+    - superpowers:writing-plans
+    - superpowers:test-driven-development
+    - superpowers:subagent-driven-development
+    - superpowers:verification-before-completion
+    - superpowers:dispatching-parallel-agents
+    - superpowers:using-git-worktrees
+    - superpowers:systematic-debugging
+    - superpowers:finishing-a-development-branch
+    - superpowers:requesting-code-review
+    - superpowers:receiving-code-review
+  gsd:
+    - gsd-import
+    - gsd-docs-update
+    - gsd-forensics
+    - gsd-ns-review
+  engine: everything-claude-code
+  openspec_cli: openspec
+
+skill_invocation_rules:
+  - In `human_gate: true` stages, sub-skills are for exploration/structuring only.
+  - Implementation sub-skills require explicit PM approval.
+  - GSD skills are invoked via the `Skill` tool, not Codex `$` syntax.

@@ -9,6 +9,11 @@
 - 人类门控：是（`human_gate: true`）
 - 下一 stage：`product-prototype`
 
+## 子技能准备
+
+1. 调用 `superpowers:brainstorming` 提出 2-3 种设计方案及 trade-offs，等待 PM 确认。
+2. PM 确认后，调用 `superpowers:writing-plans` 规划 `designs/{design_id}/` 下的文件结构与每份文档的职责。
+
 ## 执行指令
 
 1. 读取 `.claude/skills/interview-workflow/prompts/draft-product-design.md` 获取完整执行步骤

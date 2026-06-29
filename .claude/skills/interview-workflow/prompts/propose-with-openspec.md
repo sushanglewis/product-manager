@@ -31,7 +31,11 @@ Invoke `openspec propose` using the confirmed TDD development plan to create the
    - `designs/<design_id>/tdd-plan.md`
    - `designs/<design_id>/prototype.pen`
    - Core design docs under `designs/<design_id>/`
-8. If any artifact is missing, empty, or missing design references, report the error and pause for human intervention.
+8. Call `superpowers:verification-before-completion` to verify the artifacts before claiming completion:
+   - Run `python .claude/skills/interview-workflow/validators/validate.py --phase exit --check openspec_artifact_complete --args <change_name>,<design_id>`
+   - Run `python .claude/skills/interview-workflow/validators/validate.py --phase exit --check tasks_extracted --args <change_name>`
+   - Read the output and confirm PASS. Do not claim completion without fresh verification evidence.
+9. If any artifact is missing, empty, or missing design references, report the error and pause for human intervention.
 
 ## Output Artifacts
 

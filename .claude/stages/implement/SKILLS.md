@@ -59,3 +59,24 @@ python .claude/skills/interview-workflow/validators/validate.py \
 
 - 合并的 PR（由人类创建）
 - `.github/lincoln-sync-queue/pr-{pr_number}.yaml` — 触发 sync-knowledge 的队列文件
+
+## 按需调用的子技能
+
+本阶段由人类研发团队主导，Agent 仅在收到明确请求时调用以下技能：
+
+| 场景 | 调用技能 |
+|------|----------|
+| 需要隔离工作区 | `superpowers:using-git-worktrees` |
+| 需要 Agent 分任务实现 | `superpowers:subagent-driven-development` |
+| 需要 TDD 指导 | `superpowers:test-driven-development` |
+| 遇到 bug/测试失败 | `superpowers:systematic-debugging` |
+| 完成实现后处理 PR | `superpowers:finishing-a-development-branch` |
+| 需要代码审查 | `superpowers:requesting-code-review` |
+| 收到审查意见 | `superpowers:receiving-code-review` |
+| 任何“完成”声明前 | `superpowers:verification-before-completion` |
+
+## human_gate 规则
+
+- Agent **不得主动**调用任何实施类子技能。
+- 所有子技能调用必须基于人类显式请求（如“帮我用 TDD 实现这个 issue”）。
+- PR 合并作为人类确认事件，触发 `sync-knowledge`。

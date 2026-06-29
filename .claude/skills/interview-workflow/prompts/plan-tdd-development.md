@@ -11,6 +11,14 @@ Create `designs/<design_id>/tdd-plan.md` as the bridge from product design to Op
 - `session_id`: the interview session identifier
 - `design_id`: the product design identifier
 
+## 子技能准备
+
+在执行本 prompt 前：
+1. 调用 `superpowers:writing-plans` 规划 `tdd-plan.md` 结构。
+2. 遵循 `superpowers:test-driven-development` 方法论：确保每个任务切片都是“先写失败测试 → 最小实现 → 重构”序列。
+3. 在 `tdd-plan.md` 头部加入：  
+   `> **Required sub-skill:** Use superpowers:test-driven-development for all implementation`
+
 ## Steps
 
 1. Verify that `designs/<design_id>/ui-spec.md` contains `<!-- prototype-status: approved -->` or `[x] PM 已确认原型`.

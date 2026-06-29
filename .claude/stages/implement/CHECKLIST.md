@@ -9,6 +9,7 @@
 
 ## 执行检查 (Execution Checks) — 人类主导
 
+- [ ] 所有子技能调用均来自人类明确请求
 - [ ] 人类研发团队认领 Issue 并创建开发分支
 - [ ] 人类编写代码和测试
 - [ ] 人类提交 PR 并关联 Issue（PR 描述中包含 `Fixes #<issue_number>` 或 `Closes #<issue_number>`）

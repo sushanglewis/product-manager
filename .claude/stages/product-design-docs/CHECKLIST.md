@@ -10,6 +10,9 @@
 
 ## 执行中检查
 
+- [ ] 已调用 `superpowers:brainstorming` 探索 ≥2 种设计方向
+- [ ] PM 已确认设计方向（`design-review.md` 含 `<!-- status: approved -->` 或 `[x] PM 已确认设计文档`）
+- [ ] 已调用 `superpowers:writing-plans` 规划文档结构
 - [ ] 已创建 `designs/<design_id>/` 目录
 - [ ] 已读取全部需求文档
 - [ ] `design-review.md` 包含决策摘要、范围、文档链接、待解决问题和审批清单
