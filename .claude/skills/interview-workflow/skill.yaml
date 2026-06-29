@@ -99,6 +99,14 @@ commands:
         description: GitHub PR 编号
         required: true
 
+  lincoln-workflow-router:
+    description: 启动时评估上下文并选择工作流模板
+    prompt: prompts/router-prompt.md
+    arguments:
+      - name: project_root
+        description: 项目根目录，默认当前目录
+        required: false
+
   workflow-continue:
     description: 人类修改文件后继续被暂停的工作流
     prompt: prompts/workflow-continue.md
@@ -132,6 +140,12 @@ skill_ecosystem:
     - gsd-ns-review
   engine: everything-claude-code
   openspec_cli: openspec
+  templates:
+    - interview-to-knowledge
+    - existing-project-iteration
+    - bug-fix
+    - design-spike
+    - oss-first-design
 
 skill_invocation_rules:
   - In `human_gate: true` stages, sub-skills are for exploration/structuring only.
