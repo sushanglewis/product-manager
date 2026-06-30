@@ -111,3 +111,64 @@ def test_state_file_in_project_has_all_stages():
     expected = {s["id"] for s in workflow["steps"]}
     actual = set(state["stages"].keys())
     assert actual == expected
+
+
+def test_action_validate_records_validator_history(fresh_state):
+    from scripts.stage_loader import action_validate
+    state = load_state(fresh_state)
+    # Set up a stage with entry checks that will fail (so we get history)
+    # First, set ingest to completed so we can validate clarify entry
+    state["stages"]["ingest"]["status"] = "completed"
+    state["stages"]["ingest"]["entry_checks_passed"] = True
+    state["stages"]["ingest"]["exit_checks_passed"] = True
+    save_state(state, fresh_state)
+
+    # Now run validate-entry for clarify - it will fail because summary.md doesn't exist
+    action_validate("clarify", state, "entry", fresh_state)
+
+    updated = load_state(fresh_state)
+    clarify_state = updated["stages"]["clarify"]
+    assert "validator_history" in clarify_state
+    assert len(clarify_state["validator_history"]) > 0
+    # Check the first history entry has the expected keys
+    entry = clarify_state["validator_history"][0]
+    assert "phase" in entry
+    assert "check" in entry
+    assert "exit_code" in entry
+    assert "run_at" in entry
+
+
+def test_action_validate_exit_records_validator_history(fresh_state):
+    from scripts.stage_loader import action_validate
+    state = load_state(fresh_state)
+    # Set up a stage that is in_progress
+    state["stages"]["ingest"]["status"] = "in_progress"
+    state["stages"]["ingest"]["entry_checks_passed"] = True
+    state["stages"]["ingest"]["started_at"] = "2026-06-27T00:00:00Z"
+    save_state(state, fresh_state)
+
+    # Run validate-exit for ingest - it will fail because summary.md doesn't exist
+    action_validate("ingest", state, "exit", fresh_state)
+
+    updated = load_state(fresh_state)
+    ingest_state = updated["stages"]["ingest"]
+    assert "validator_history" in ingest_state
+    assert len(ingest_state["validator_history"]) > 0
+
+
+def test_action_transition_next_records_duration_seconds(fresh_state):
+    from scripts.stage_loader import action_transition_next
+    state = load_state(fresh_state)
+    state["stages"]["ingest"]["status"] = "completed"
+    state["stages"]["ingest"]["entry_checks_passed"] = True
+    state["stages"]["ingest"]["exit_checks_passed"] = True
+    state["stages"]["ingest"]["started_at"] = "2026-06-27T00:00:00Z"
+    state["stages"]["ingest"]["completed_at"] = None  # will be set by transition
+    save_state(state, fresh_state)
+
+    action_transition_next("ingest", state, fresh_state)
+
+    updated = load_state(fresh_state)
+    ingest_state = updated["stages"]["ingest"]
+    assert "duration_seconds" in ingest_state
+    assert isinstance(ingest_state["duration_seconds"], int) or ingest_state["duration_seconds"] is None
