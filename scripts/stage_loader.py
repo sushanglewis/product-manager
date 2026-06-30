@@ -44,6 +44,9 @@ VALIDATOR_PATH = (
     / "validate.py"
 )
 
+SKILL_ROUTING_PATH = PROJECT_ROOT / ".claude" / "skill-routing.yaml"
+CONTEXT_DIR = PROJECT_ROOT / ".context"
+
 REQUIRED_STATE_KEYS = {
     "schema_version",
     "workflow",
@@ -200,14 +203,31 @@ def action_load(stage_id: str, state: dict[str, Any]) -> dict[str, Any]:
         raise FileNotFoundError(f"Stage directory not found: {stage_dir}")
 
     context_parts: list[str] = []
+    context_paths: list[str] = []
     for filename in ["AGENTS.md", "CHECKLIST.md", "SKILLS.md", "PROMPT.md"]:
         path = stage_dir / filename
         if path.exists():
             context_parts.append(path.read_text(encoding="utf-8"))
+            context_paths.append(str(path.relative_to(PROJECT_ROOT)))
 
     variables = state.get("variables", {})
     context = "\n\n---\n\n".join(context_parts)
     context = interpolate(context, variables)
+
+    # Load skills from skill-routing.yaml if available
+    skills = {"required": [], "optional": []}
+    if SKILL_ROUTING_PATH.exists():
+        try:
+            routing_data = yaml.safe_load(SKILL_ROUTING_PATH.read_text(encoding="utf-8"))
+            if isinstance(routing_data, dict):
+                routing = routing_data.get("routing", {})
+                stage_routing = routing.get(stage_id, {})
+                skills = {
+                    "required": stage_routing.get("required", []),
+                    "optional": stage_routing.get("optional", []),
+                }
+        except Exception:
+            pass
 
     return {
         "stage_id": stage_id,
@@ -216,6 +236,9 @@ def action_load(stage_id: str, state: dict[str, Any]) -> dict[str, Any]:
         "human_gate": stage_def.get("human_gate", False),
         "next_stage": compute_next_stage(workflow, stage_id),
         "context": context,
+        "context_paths": context_paths,
+        "required_skills": skills["required"],
+        "optional_skills": skills["optional"],
     }
 
 
@@ -237,11 +260,28 @@ def action_validate(
         stage_state["status"] = "entry_validating"
     save_state(state, state_file)
 
+    # Initialize validator_history if not present
+    if "validator_history" not in stage_state:
+        stage_state["validator_history"] = []
+
     for check in checks:
         check_name = check["check"]
         raw_args = check.get("args", [])
         args = [interpolate(str(a), variables) for a in raw_args]
         exit_code, stdout, stderr = run_validator(phase, check_name, args)
+
+        # Record validator history
+        stage_state["validator_history"].append(
+            {
+                "phase": phase,
+                "check": check_name,
+                "exit_code": exit_code,
+                "stdout": stdout,
+                "stderr": stderr,
+                "run_at": now_iso(),
+            }
+        )
+
         if exit_code != 0:
             stage_state["status"] = "validation_failed"
             stage_state["error_message"] = (
@@ -276,6 +316,20 @@ def action_transition_next(stage_id: str, state: dict[str, Any], state_file: Pat
     stage_state = state.setdefault("stages", {}).setdefault(stage_id, {})
     stage_state["status"] = "completed"
     stage_state["completed_at"] = now_iso()
+
+    # Compute duration_seconds from started_at to completed_at
+    started_at = stage_state.get("started_at")
+    completed_at = stage_state.get("completed_at")
+    if started_at and completed_at:
+        try:
+            from datetime import datetime
+            start_dt = datetime.fromisoformat(started_at.replace("Z", "+00:00"))
+            end_dt = datetime.fromisoformat(completed_at.replace("Z", "+00:00"))
+            stage_state["duration_seconds"] = int((end_dt - start_dt).total_seconds())
+        except (ValueError, TypeError):
+            stage_state["duration_seconds"] = None
+    else:
+        stage_state["duration_seconds"] = None
 
     if next_stage_id:
         next_state = state.setdefault("stages", {}).setdefault(next_stage_id, {})
@@ -333,10 +387,71 @@ def action_recover(state: dict[str, Any], state_file: Path | None = None) -> dic
         "current_status": state["current_run"].get("status"),
     }
 
+def action_status(state: dict[str, Any]) -> dict[str, Any]:
+    """Return status report by delegating to lincoln-status logic."""
+    # Import here to avoid circular import at module level
+    # When called as __main__, sys.path already includes project root
+    import importlib.util
+    status_path = PROJECT_ROOT / "scripts" / "lincoln-status.py"
+    spec = importlib.util.spec_from_file_location("lincoln_status", status_path)
+    if spec and spec.loader:
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.build_status_report(state)
+    # Fallback: try direct import
+    try:
+        from lincoln_status import build_status_report
+        return build_status_report(state)
+    except ImportError:
+        raise RuntimeError("Could not import lincoln-status module")
 
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
+
+def action_handoff_report(stage_id: str, state: dict[str, Any]) -> str:
+    """Generate .context/lincoln-handoff.md with current stage summary."""
+    template_name = state.get("current_run", {}).get("workflow_template")
+    workflow = load_workflow(template_name)
+    stage_def = find_stage(workflow, stage_id)
+    stage_state = state.get("stages", {}).get(stage_id, {})
+
+    lines = []
+    lines.append("# Lincoln Handoff Report")
+    lines.append("")
+    lines.append(f"**Generated:** {now_iso()}")
+    lines.append(f"**Branch:** {state.get('current_run', {}).get('branch', 'unknown')}")
+    lines.append(f"**Run ID:** {state.get('current_run', {}).get('run_id', 'unknown')}")
+    lines.append("")
+    lines.append("## Current Stage")
+    lines.append(f"- **Stage:** {stage_id}")
+    lines.append(f"- **Name:** {stage_def.get('name', stage_id)}")
+    lines.append(f"- **Status:** {stage_state.get('status', 'unknown')}")
+    lines.append("")
+    lines.append("## Waiting For")
+    lines.append(f"- **Waiting for:** {'human' if stage_def.get('human_gate') and not stage_state.get('human_gate_passed') else 'agent'}")
+    lines.append("")
+    lines.append("## Artifacts")
+    produced = stage_state.get("artifacts_produced", [])
+    required = stage_def.get("artifacts", [])
+    if produced:
+        lines.append("### Produced")
+        for art in produced:
+            lines.append(f"- [x] {art}")
+    if required:
+        lines.append("### Required")
+        for art in required:
+            checked = "x" if art in produced else " "
+            lines.append(f"- [{checked}] {art}")
+    lines.append("")
+    lines.append("## Next Action")
+    lines.append(f"{stage_state.get('status', 'unknown')}")
+    lines.append("")
+    lines.append("---")
+    lines.append("*This file is auto-generated by `scripts/stage_loader.py --action handoff-report`*")
+
+    content = "\n".join(lines)
+    CONTEXT_DIR.mkdir(parents=True, exist_ok=True)
+    handoff_path = CONTEXT_DIR / "lincoln-handoff.md"
+    handoff_path.write_text(content, encoding="utf-8")
+    return str(handoff_path)
 
 
 def main() -> int:
@@ -345,7 +460,7 @@ def main() -> int:
     parser.add_argument(
         "--action",
         required=True,
-        choices=["load", "validate-entry", "validate-exit", "transition-next", "recover"],
+        choices=["load", "validate-entry", "validate-exit", "transition-next", "recover", "status", "handoff-report"],
     )
     parser.add_argument("--state-file", type=Path, default=STATE_PATH)
     parser.add_argument("--project-root", type=Path, default=PROJECT_ROOT)
@@ -375,6 +490,19 @@ def main() -> int:
     if args.action == "recover":
         result = action_recover(state, args.state_file)
         print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+
+    if args.action == "status":
+        result = action_status(state)
+        # Print as table by default
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+
+    if args.action == "handoff-report":
+        if not args.stage:
+            parser.error("--stage is required for handoff-report")
+        path = action_handoff_report(args.stage, state)
+        print(f"Handoff report written to: {path}")
         return 0
 
     return 0

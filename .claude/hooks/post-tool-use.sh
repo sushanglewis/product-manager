@@ -67,4 +67,55 @@ fi
     --project-root "$ROOT" \
     2>/dev/null || true
 
+# Trace logging: record key tool invocations to lincoln-trace.jsonl
+# Do not fail the hook if trace write fails; log to stderr and continue.
+TRACE_DIR="$ROOT/.omc/state"
+TRACE_FILE="$TRACE_DIR/lincoln-trace.jsonl"
+
+# Determine if this tool should be traced
+TRACE=false
+TARGET=""
+if [[ "$TOOL_NAME" == "Skill" ]]; then
+    TRACE=true
+    # Extract skill name from JSON args
+    SKILL_NAME=$(echo "$TOOL_ARGS" | "$PYTHON" -c "import sys,json; d=json.load(sys.stdin); print(d.get('skill',''))" 2>/dev/null || echo "")
+    SKILL_ARGS=$(echo "$TOOL_ARGS" | "$PYTHON" -c "import sys,json; d=json.load(sys.stdin); print(json.dumps(d.get('args','')))" 2>/dev/null || echo "")
+    TARGET="skill:$SKILL_NAME"
+    TRACE_JSON=$(cat <<EOF
+{"tool": "Skill", "skill": "$SKILL_NAME", "args": $SKILL_ARGS, "stage": "STAGE_PLACEHOLDER", "timestamp": "TIMESTAMP_PLACEHOLDER"}
+EOF
+)
+elif [[ "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "Bash" ]]; then
+    TRACE=true
+    if [[ "$TOOL_NAME" == "Bash" ]]; then
+        TARGET=$(echo "$TOOL_ARGS" | "$PYTHON" -c "import sys,json; d=json.load(sys.stdin); print(d.get('command','')[:80])" 2>/dev/null || echo "bash")
+    else
+        TARGET=$(echo "$TOOL_ARGS" | "$PYTHON" -c "import sys,json; d=json.load(sys.stdin); print(d.get('file_path',''))" 2>/dev/null || echo "")
+    fi
+    TRACE_JSON=$(cat <<EOF
+{"tool": "$TOOL_NAME", "target": "$TARGET", "stage": "STAGE_PLACEHOLDER", "timestamp": "TIMESTAMP_PLACEHOLDER"}
+EOF
+)
+fi
+
+if [[ "$TRACE" == true ]]; then
+    # Read current stage from workflow state
+    CURRENT_STAGE=$("$PYTHON" - "$STATE_FILE" <<'PY' 2>/dev/null
+import sys, yaml
+path = sys.argv[1]
+state = yaml.safe_load(open(path, encoding="utf-8"))
+print(state.get("current_run", {}).get("current_stage") or "unknown")
+PY
+) || CURRENT_STAGE="unknown"
+
+    TIMESTAMP=$("$PYTHON" -c "from datetime import datetime, timezone; print(datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'))" 2>/dev/null) || TIMESTAMP=""
+
+    # Replace placeholders
+    TRACE_LINE=$(echo "$TRACE_JSON" | sed "s/STAGE_PLACEHOLDER/$CURRENT_STAGE/g; s/TIMESTAMP_PLACEHOLDER/$TIMESTAMP/g")
+
+    # Ensure directory exists and append
+    mkdir -p "$TRACE_DIR" 2>/dev/null || true
+    echo "$TRACE_LINE" >> "$TRACE_FILE" 2>/dev/null || echo "[lincoln-trace] Failed to write trace entry" >&2
+fi
+
 exit 0

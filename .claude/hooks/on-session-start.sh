@@ -51,4 +51,16 @@ fi
 echo "=== End Stage Context ==="
 echo ""
 
+# Run lincoln-status.py for a comprehensive summary at the end of startup
+STATUS_OUTPUT=$("$PYTHON" "$ROOT/scripts/lincoln-status.py" --format markdown 2>/dev/null) || STATUS_OUTPUT=""
+if [[ -n "$STATUS_OUTPUT" ]]; then
+    echo "=== Lincoln Status Summary ==="
+    echo "$STATUS_OUTPUT"
+    echo "=== End Lincoln Status Summary ==="
+    echo ""
+else
+    echo "[Lincoln status summary unavailable. Run manually: python3 scripts/lincoln-status.py --format markdown]"
+    echo ""
+fi
+
 exit 0
