@@ -36,7 +36,7 @@
 
 ## 状态感知
 
-- 检查 `.claude/workflow-state.yaml` 获取当前 `session_id`
+- 检查 `.claude/workflow-stage.yaml` 获取当前 `session_id`
 - 检查 `.github/linked-issues.yaml` 获取待实现的 Issue 列表
 - 如果 `stages.implement.status` 不是 `not_started`，检查是否已部分完成
 

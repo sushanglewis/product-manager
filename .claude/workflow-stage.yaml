@@ -1,0 +1,142 @@
+schema_version: 1.0.0
+workflow:
+  name: interview-to-knowledge
+  version: 1.0.0
+current_run:
+  run_id: test-001
+  branch: lincoln/test-branch
+  started_at: '2026-06-27T00:00:00Z'
+  last_updated_at: '2026-07-01T11:12:54Z'
+  current_stage: ingest
+  previous_stage: null
+  status: in_progress
+stages:
+  ingest:
+    status: completed
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
+  clarify:
+    status: validation_failed
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 1
+  product-design-docs:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
+  product-prototype:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
+  tdd-development-plan:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
+  propose:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
+  split:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
+  implement:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
+  sync-knowledge:
+    status: not_started
+    started_at: null
+    completed_at: null
+    entry_checks_passed: null
+    entry_checks_run_at: null
+    exit_checks_passed: null
+    exit_checks_run_at: null
+    human_gate_passed: null
+    human_gate_passed_at: null
+    artifacts_produced: []
+    error_message: null
+    retry_count: 0
+variables:
+  session_id: 2026-06-27-test
+  design_id: null
+  change_name: null
+  issue_number: null
+  pr_number: null
+  feature_slug: null
+recovery:
+  last_validated_checkpoint: ingest
+  can_resume_from: clarify
+  abort_reason: null
+  abort_at: null

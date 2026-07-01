@@ -2,7 +2,7 @@
 
 ## 技能路由
 
-本阶段技能路由定义见 `.claude/skill-routing.yaml`：
+本阶段技能路由定义见 `.claude/skills/routing.yaml`：
 - **required**: `superpowers:writing-plans`, `superpowers:test-driven-development`
 - **optional**: `gsd:plan-phase`, `gsd:mvp-phase`, `oh-my-claudecode:plan`
 - **human_gate**: 否
@@ -10,11 +10,11 @@
 ## 主技能命令
 
 - **命令**: `plan-tdd-development`
-- **来源**: `.claude/skills/interview-workflow/skill.yaml`
+- **来源**: `.claude/skills/`
 - **参数**:
   - `session_id` (必填): 访谈会话 ID，如 `2026-06-27-stakeholder`
   - `design_id` (必填): 产品设计 ID，如 `checkout-redesign`
-- **提示文件**: `.claude/skills/interview-workflow/prompts/plan-tdd-development.md`
+- **提示文件**: `.claude/skills/plan-tdd-development/prompts/main.md`
 
 ## 辅助技能
 
@@ -25,19 +25,19 @@
 
 ## 校验器使用
 
-- **校验器路径**: `.claude/skills/interview-workflow/validators/validate.py`
+- **校验器路径**: `scripts/validate_stage.py`
 - **使用方式**:
   ```bash
   # 准入校验（原型就绪）
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase entry --check prototype_ready --args {design_id}
 
   # 准入校验（原型产物完整）
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase entry --check prototype_artifact_complete --args {design_id}
 
   # 退出校验（TDD 计划完整）
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase exit --check tdd_plan_complete --args {design_id}
   ```
 

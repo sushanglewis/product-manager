@@ -2,7 +2,7 @@
 
 ## 技能路由
 
-本阶段技能路由定义见 `.claude/skill-routing.yaml`：
+本阶段技能路由定义见 `.claude/skills/routing.yaml`：
 - **required**: `superpowers:dispatching-parallel-agents`
 - **optional**: `gsd:phase`, `oh-my-claudecode:team`
 - **human_gate**: 否
@@ -40,7 +40,7 @@ claude split-to-github <session_id> <change_name>
 
 入口校验：
 ```bash
-python .claude/skills/interview-workflow/validators/validate.py \
+python scripts/validate_stage.py \
   --phase entry \
   --check openspec_tasks_ready \
   --args <change_name>
@@ -48,12 +48,12 @@ python .claude/skills/interview-workflow/validators/validate.py \
 
 退出校验：
 ```bash
-python .claude/skills/interview-workflow/validators/validate.py \
+python scripts/validate_stage.py \
   --phase exit \
   --check issues_created \
   --args <session_id>
 
-python .claude/skills/interview-workflow/validators/validate.py \
+python scripts/validate_stage.py \
   --phase exit \
   --check tasks_link_back_to_issues \
   --args <session_id>

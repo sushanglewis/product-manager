@@ -45,7 +45,7 @@
 
 ## 继承规则
 
-本文件继承 `.claude/AGENTS.md` 中的核心原则：
+本文件继承 `.claude/agents/default.md` 中的核心原则：
 - 工作流优先
 - 产物可追溯
 - 不修改原始录音
@@ -56,7 +56,7 @@
 
 **产物目录**: `interviews/{session_id}/`
 **校验命令**:
-- 准入: `python .claude/skills/interview-workflow/validators/validate.py --phase entry --check file_exists --args {recording_path}`
-- 准入: `python .claude/skills/interview-workflow/validators/validate.py --phase entry --check audio_format_supported --args {recording_path}`
-- 退出: `python .claude/skills/interview-workflow/validators/validate.py --phase exit --check transcript_has_timestamps --args {session_id}`
-- 退出: `python .claude/skills/interview-workflow/validators/validate.py --phase exit --check summary_has_key_topics --args {session_id}`
+- 准入: `python scripts/validate_stage.py --phase entry --check file_exists --args {recording_path}`
+- 准入: `python scripts/validate_stage.py --phase entry --check audio_format_supported --args {recording_path}`
+- 退出: `python scripts/validate_stage.py --phase exit --check transcript_has_timestamps --args {session_id}`
+- 退出: `python scripts/validate_stage.py --phase exit --check summary_has_key_topics --args {session_id}`

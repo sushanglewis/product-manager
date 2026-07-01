@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-VALIDATOR_DIR = Path(__file__).resolve().parents[2] / ".claude" / "skills" / "interview-workflow" / "validators"
+VALIDATOR_DIR = Path(__file__).resolve().parents[2] / ".claude" / "skills" / "lincoln-workflow" / "validators"
 sys.path.insert(0, str(VALIDATOR_DIR))
 
 import validate

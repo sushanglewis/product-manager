@@ -2,7 +2,7 @@
 
 ## 技能路由
 
-本阶段技能路由定义见 `.claude/skill-routing.yaml`：
+本阶段技能路由定义见 `.claude/skills/routing.yaml`：
 - **required**: `superpowers:test-driven-development`, `superpowers:verification-before-completion`
 - **optional**: `openspec:apply-change`, `superpowers:subagent-driven-development`, `superpowers:using-git-worktrees`, `superpowers:systematic-debugging`, `superpowers:finishing-a-development-branch`, `superpowers:requesting-code-review`, `superpowers:receiving-code-review`, `gsd:execute-phase`, `gsd:code-review`, `gsd:debug`, `oh-my-claudecode:team`, `oh-my-claudecode:autopilot`, `oh-my-claudecode:ralph`, `oh-my-claudecode:ultrawork`
 - **human_gate**: 是
@@ -39,7 +39,7 @@ claude /security-review
 
 入口校验：
 ```bash
-python .claude/skills/interview-workflow/validators/validate.py \
+python scripts/validate_stage.py \
   --phase entry \
   --check issues_ready \
   --args <session_id>

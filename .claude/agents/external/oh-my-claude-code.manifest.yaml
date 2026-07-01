@@ -1,0 +1,21 @@
+---
+schema_version: 1.0.0
+framework: oh-my-claude-code
+source: https://github.com/zephyrpersonal/oh-my-claude-code.git
+ref: main
+paths:
+  agents: .claude/agents
+sync_strategy: sparse-checkout
+imported_agents:
+  - advisor
+  - critic
+  - risk-assessor
+---
+
+# oh-my-claude-code Agent Manifest
+
+本文件声明 Lincoln 需要引用的 oh-my-claude-code 框架 agent。
+
+运行 `scripts/sync-external-agents.sh` 会根据本 manifest 把指定 agent 拉取到 `.claude/agents/external/oh-my-claude-code/`。
+
+这些 agent 供 Lincoln 自有角色通过 `extends` 字段组合使用。

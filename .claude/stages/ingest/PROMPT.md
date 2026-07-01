@@ -16,12 +16,12 @@
 
 ## 执行指令
 
-1. **读取完整提示文件**: `.claude/skills/interview-workflow/prompts/process-interview.md`
+1. **读取完整提示文件**: `.claude/skills/process-interview/prompts/main.md`
    - 该文件包含详细的转写步骤、产物格式和规则
    - 按照提示文件中的步骤 1-9 执行
 
 2. **阶段状态感知**:
-   - 检查 `.claude/workflow-state.yaml` 中的 `current_run` 和 `stages.ingest` 状态
+   - 检查 `.claude/workflow-stage.yaml` 中的 `current_run` 和 `stages.ingest` 状态
    - 若状态为 `completed`，跳过重复执行
    - 若状态为 `validation_failed`，根据 `error_message` 修复后重试
 

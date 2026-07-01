@@ -54,7 +54,7 @@
 
 ## 继承规则
 
-本文件继承 `.claude/AGENTS.md` 中的核心原则：
+本文件继承 `.claude/agents/default.md` 中的核心原则：
 - 工作流优先
 - 人类确认节点不可跳过
 - 产物可追溯（每个需求关联访谈时间戳）
@@ -66,6 +66,6 @@
 
 **产物目录**: `requirements/{session_id}/`
 **校验命令**:
-- 准入: `python .claude/skills/interview-workflow/validators/validate.py --phase entry --check summary_ready --args {session_id}`
-- 退出: `python .claude/skills/interview-workflow/validators/validate.py --phase exit --check requirements_has_background_problem_solution_acceptance --args {session_id}`
-- 退出: `python .claude/skills/interview-workflow/validators/validate.py --phase exit --check human_approved --args {session_id}`
+- 准入: `python scripts/validate_stage.py --phase entry --check summary_ready --args {session_id}`
+- 退出: `python scripts/validate_stage.py --phase exit --check requirements_has_background_problem_solution_acceptance --args {session_id}`
+- 退出: `python scripts/validate_stage.py --phase exit --check human_approved --args {session_id}`

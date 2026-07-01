@@ -1,0 +1,77 @@
+---
+schema_version: 1.0.0
+description: |
+  Declares external skills and CLIs required by the Lincoln workflow.
+  Run `scripts/check-skill-dependencies.sh` to verify the local environment.
+
+skills:
+  superpowers:
+    source: https://github.com/sushanglewis/claude-superpowers.git
+    ref: v1.2.0
+    type: skill
+    required_skills:
+      - superpowers:brainstorming
+      - superpowers:writing-plans
+      - superpowers:test-driven-development
+      - superpowers:subagent-driven-development
+      - superpowers:verification-before-completion
+      - superpowers:dispatching-parallel-agents
+      - superpowers:using-git-worktrees
+      - superpowers:systematic-debugging
+      - superpowers:finishing-a-development-branch
+      - superpowers:requesting-code-review
+      - superpowers:receiving-code-review
+      - superpowers:writing-skills
+
+  gsd:
+    source: https://github.com/sushanglewis/gsd-skills.git
+    ref: v2.0.1
+    type: skill
+    required_skills:
+      - gsd-import
+      - gsd-docs-update
+      - gsd-forensics
+      - gsd-ns-review
+      - gsd-code-review
+      - gsd-debug
+      - gsd-eval-review
+      - gsd-ingest-docs
+
+  openspec:
+    source: https://github.com/Fission-AI/openspec.git
+    ref: v0.5.0
+    type: cli
+    binary: openspec
+
+  lincoln-explore-opensource:
+    source: inline
+    type: skill
+    path: .claude/skills/lincoln-explore-opensource
+
+  lincoln-build-codebase-knowledge:
+    source: inline
+    type: skill
+    path: .claude/skills/lincoln-build-codebase-knowledge
+
+  lincoln-workflow-router:
+    source: inline
+    type: skill
+    path: .claude/skills/lincoln-workflow-router
+
+  # oh-my-claudecode — optional multi-agent orchestration layer
+  oh-my-claudecode:
+    source: https://github.com/sushanglewis/oh-my-claudecode.git
+    ref: v1.0.0
+    type: plugin
+    required: false
+    recommended_skills:
+      - oh-my-claudecode:plan
+      - oh-my-claudecode:team
+      - oh-my-claudecode:verify
+      - oh-my-claudecode:autopilot
+      - oh-my-claudecode:ralph
+      - oh-my-claudecode:ultrawork
+      - oh-my-claudecode:deep-interview
+      - oh-my-claudecode:ai-slop-cleaner
+      - oh-my-claudecode:wiki
+      - oh-my-claudecode:writer-memory

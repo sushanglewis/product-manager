@@ -83,4 +83,4 @@ Agent 仅在人类明确请求时调用以下子技能：
 1. 每个 PR 必须关联至少一个 GitHub Issue
 2. PR 描述应包含：关联 Issue 编号、变更摘要、测试计划
 3. 代码合并前必须通过代码审查和自动化测试
-4. Agent 辅助的代码审查应遵循 `.claude/AGENTS.md` 中的代码质量规范
+4. Agent 辅助的代码审查应遵循 `.claude/agents/default.md` 中的代码质量规范

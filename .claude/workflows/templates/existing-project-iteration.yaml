@@ -9,7 +9,7 @@ workflow:
       name: 工作流路由
       action: lincoln-workflow-router
       artifacts:
-        - .claude/workflow-state.yaml
+        - .claude/workflow-stage.yaml
 
     - id: build-codebase-knowledge
       name: 构建代码知识库

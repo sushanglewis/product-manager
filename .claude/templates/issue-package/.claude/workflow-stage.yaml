@@ -1,0 +1,26 @@
+---
+schema_version: 2.0.0
+workflow:
+  name: interview-to-knowledge
+  version: 1.0.0
+  template: interview-to-knowledge
+current_run:
+  run_id: ""
+  branch: ""
+  current_stage: not_started
+  status: not_started
+  started_at: ""
+  last_updated_at: ""
+  variables:
+    session_id: ""
+    design_id: ""
+    change_name: ""
+    issue_number: ""
+    pr_number: ""
+    feature_slug: ""
+nodes: []
+recovery:
+  last_validated_checkpoint: ""
+  can_resume_from: ""
+  abort_reason: null
+  abort_at: null

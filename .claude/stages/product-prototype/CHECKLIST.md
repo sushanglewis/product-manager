@@ -5,7 +5,7 @@
 - [ ] `designs/<design_id>/design-review.md` 存在且非空
 - [ ] 设计评审文档包含批准标记（`<!-- status: approved -->` 或 `[x] PM 已确认设计文档`）
 - [ ] 设计文档包完整（6 个文件均存在且非空）
-- [ ] 校验命令通过：`python .claude/skills/interview-workflow/validators/validate.py --phase entry --check product_design_approved --args <design_id>`
+- [ ] 校验命令通过：`python scripts/validate_stage.py --phase entry --check product_design_approved --args <design_id>`
 
 ## 执行中检查
 
@@ -25,7 +25,7 @@
 - [ ] `prototype.pen` 存在且非空（仅通过 Pencil MCP 工具验证）
 - [ ] `fields.md` 存在且非空，包含字段、校验、错误状态章节
 - [ ] `ui-spec.md` 存在且非空，包含界面、交互、状态章节
-- [ ] 校验命令通过：`python .claude/skills/interview-workflow/validators/validate.py --phase exit --check prototype_artifact_complete --args <design_id>`
+- [ ] 校验命令通过：`python scripts/validate_stage.py --phase exit --check prototype_artifact_complete --args <design_id>`
 
 ## 产物验证
 

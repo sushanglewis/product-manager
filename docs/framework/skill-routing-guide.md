@@ -6,7 +6,7 @@
 
 ## 技能生态总览
 
-Lincoln 作为编排层，不替代任何专业工具。每个阶段声明推荐技能集（required + optional），Agent 通过 `SKILLS.md` 和 `skill-routing.yaml` 知道本阶段可以调用哪些技能、触发条件、限制条件。
+Lincoln 作为编排层，不替代任何专业工具。每个阶段声明推荐技能集（required + optional），Agent 通过 `SKILLS.md` 和 `.claude/skills/routing.yaml` 知道本阶段可以调用哪些技能、触发条件、限制条件。
 
 ---
 
@@ -149,7 +149,7 @@ Lincoln 作为编排层，不替代任何专业工具。每个阶段声明推荐
 
 ### 四层路由体系
 
-1. **默认路由**：`.claude/skill-routing.yaml` 定义全局默认映射。
+1. **默认路由**：`.claude/skills/routing.yaml` 定义全局默认映射。
    ```yaml
    routing:
      clarify:
@@ -171,11 +171,11 @@ Lincoln 作为编排层，不替代任何专业工具。每个阶段声明推荐
        optional_remove: [openspec:explore]
    ```
 
-3. **阶段路由**：每个 `.claude/stages/<stage>/SKILLS.md` 引用 `skill-routing.yaml` 中对应条目，并补充阶段特化说明。
+3. **阶段路由**：每个 `.claude/stages/<stage>/SKILLS.md` 引用 `.claude/skills/routing.yaml` 中对应条目，并补充阶段特化说明。
    ```markdown
    ## 本阶段技能
    
-   引用 `skill-routing.yaml` → `routing.implement`：
+   引用 `.claude/skills/routing.yaml` → `routing.implement`：
    - Required: `superpowers:test-driven-development`, `superpowers:verification-before-completion`
    - Optional: `openspec:apply-change`, `superpowers:subagent-driven-development`, ...
    
@@ -204,7 +204,7 @@ Lincoln 作为编排层，不替代任何专业工具。每个阶段声明推荐
 ### 步骤 2：定义技能元数据
 
 ```yaml
-# .claude/skill-routing.yaml 新增条目
+# .claude/skills/routing.yaml 新增条目
 routing:
   <stage_id>:
     required: [existing-skill, new-skill-id]    # 或加到 optional
@@ -218,7 +218,7 @@ routing:
 
 ### 步骤 4：更新技能依赖清单
 
-若新技能需要外部 CLI 或插件，在 `.claude/skill-dependencies.yaml` 中声明：
+若新技能需要外部 CLI 或插件，在 `.claude/skills/dependencies.yaml` 中声明：
 
 ```yaml
 optional:
@@ -253,6 +253,6 @@ pytest tests/test_stage_manifest.py
 |------|----------|------|----------|
 | `lincoln-build-codebase-knowledge` | 已有源码但知识库为空 | `docs/knowledge/00-index.md` + feature docs | `existing-project-iteration` |
 | `lincoln-explore-opensource` | 设计阶段可借鉴开源方案 | `docs/research/{change_name}-oss-options.md` | `oss-first-design` |
-| `lincoln-workflow-router` | 工作流模板选择 | `.claude/workflow-state.yaml`（模板记录） | `workflow-router` |
+| `lincoln-workflow-router` | 工作流模板选择 | `.claude/workflow-stage.yaml`（模板记录） | `workflow-router` |
 
-添加自定义 Lincoln 技能时，需在 `docs/framework/skill-routing-guide.md` 的"自定义 Lincoln 技能"表格中登记，并在 `skill-routing.yaml` 中绑定到对应阶段。
+添加自定义 Lincoln 技能时，需在 `docs/framework/skill-routing-guide.md` 的"自定义 Lincoln 技能"表格中登记，并在 `.claude/skills/routing.yaml` 中绑定到对应阶段。

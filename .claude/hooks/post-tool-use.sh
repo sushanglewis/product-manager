@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # PostToolUse hook for Lincoln workflow.
-# Tracks artifacts produced by side-effect tools in the workflow state file.
+# Tracks artifacts produced by side-effect tools and detects PR/branch sync events.
 #
 # Usage (manual):
 #   .claude/hooks/post-tool-use.sh "Write" '{"file_path": "foo.md"}' 0
@@ -26,7 +26,12 @@ fi
 TOOL_NAME="${1:-}"
 TOOL_ARGS="${2:-}"
 EXIT_CODE="${3:-0}"
-STATE_FILE="${LINCOLN_STATE_FILE:-$ROOT/.claude/workflow-state.yaml}"
+STATE_FILE="${LINCOLN_STATE_FILE:-$ROOT/.claude/workflow-stage.yaml}"
+LEGACY_STATE_FILE="$ROOT/.claude/workflow-state.yaml"
+
+if [[ ! -f "$STATE_FILE" && -f "$LEGACY_STATE_FILE" ]]; then
+    STATE_FILE="$LEGACY_STATE_FILE"
+fi
 
 # Only track successful side-effect tool uses
 if [[ "$EXIT_CODE" != "0" ]]; then
@@ -44,6 +49,8 @@ SIDE_EFFECT_TOOLS=(
     "mcp__pencil__batch_design"
     "mcp__pencil__export_nodes"
     "mcp__pencil__export_html"
+    "mcp__plugin_ecc_github__create_pull_request"
+    "mcp__plugin_ecc_github__merge_pull_request"
 )
 
 is_side_effect() {
@@ -66,6 +73,28 @@ fi
     --args "$TOOL_ARGS" \
     --project-root "$ROOT" \
     2>/dev/null || true
+
+# Detect PR/branch sync events and append node record
+PR_EVENT=false
+EVENT_NODE=""
+EVENT_STATUS=""
+if [[ "$TOOL_NAME" == "mcp__plugin_ecc_github__create_pull_request" ]]; then
+    PR_EVENT=true
+    EVENT_NODE="implement"
+    EVENT_STATUS="pr_submitted"
+elif [[ "$TOOL_NAME" == "mcp__plugin_ecc_github__merge_pull_request" ]]; then
+    PR_EVENT=true
+    EVENT_NODE="implement"
+    EVENT_STATUS="merged"
+fi
+
+if [[ "$PR_EVENT" == true ]]; then
+    "$PYTHON" "$ROOT/scripts/stage_loader.py" \
+        --action append-node \
+        --node-id "$EVENT_NODE" \
+        --status "$EVENT_STATUS" \
+        2>/dev/null || true
+fi
 
 # Trace logging: record key tool invocations to lincoln-trace.jsonl
 # Do not fail the hook if trace write fails; log to stderr and continue.

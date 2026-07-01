@@ -2,7 +2,7 @@
 
 ## 技能路由
 
-本阶段技能路由定义见 `.claude/skill-routing.yaml`：
+本阶段技能路由定义见 `.claude/skills/routing.yaml`：
 - **required**: `superpowers:bootstrap`
 - **optional**: `gsd:new-project` / `gsd:new-milestone`, `oh-my-claudecode:plan`
 - **human_gate**: 是

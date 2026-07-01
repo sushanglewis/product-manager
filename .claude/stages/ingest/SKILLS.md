@@ -2,7 +2,7 @@
 
 ## 技能路由
 
-本阶段技能路由定义见 `.claude/skill-routing.yaml`：
+本阶段技能路由定义见 `.claude/skills/routing.yaml`：
 - **required**: （无）
 - **optional**: `oh-my-claudecode:deep-interview`
 - **human_gate**: 否
@@ -10,10 +10,10 @@
 ## 主技能命令
 
 - **命令**: `process-interview`
-- **来源**: `.claude/skills/interview-workflow/skill.yaml`
+- **来源**: `.claude/skills/`
 - **参数**:
   - `recording_path` (必填): 录音文件路径，如 `recordings/2026-06-27-stakeholder.m4a`
-- **提示文件**: `.claude/skills/interview-workflow/prompts/process-interview.md`
+- **提示文件**: `.claude/skills/process-interview/prompts/main.md`
 
 ## 辅助技能
 
@@ -22,21 +22,21 @@
 
 ## 校验器使用
 
-- **校验器路径**: `.claude/skills/interview-workflow/validators/validate.py`
+- **校验器路径**: `scripts/validate_stage.py`
 - **使用方式**:
   ```bash
   # 准入校验
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase entry --check file_exists --args {recording_path}
   
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase entry --check audio_format_supported --args {recording_path}
   
   # 退出校验
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase exit --check transcript_has_timestamps --args {session_id}
   
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase exit --check summary_has_key_topics --args {session_id}
   ```
 

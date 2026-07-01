@@ -1,3 +1,7 @@
+# Synced external agent definitions (manifests and sync script are committed)
+.claude/agents/external/*/
+!.claude/agents/external/.gitkeep
+
 # Audio and video recordings (large files)
 recordings/*
 !recordings/.gitkeep
@@ -30,3 +34,4 @@ node_modules/
 __pycache__/
 *.pyc
 *.log
+.omc/

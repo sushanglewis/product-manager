@@ -87,7 +87,7 @@ claude clarify-requirements <session-id>
 
 | 阶段 | 产物 | 人工门控 |
 |------|------|----------|
-| workflow-router | `.claude/workflow-state.yaml`（模板选择记录） | 否 |
+| workflow-router | `.claude/workflow-stage.yaml`（模板选择记录） | 否 |
 | lincoln-build-codebase-knowledge | `docs/knowledge/00-index.md` + 功能文档 | **是**（确认知识覆盖度） |
 | clarify-requirements | `requirements/<session>/requirements.md` | **是** |
 

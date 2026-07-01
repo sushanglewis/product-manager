@@ -23,7 +23,7 @@
 1. **确认入口条件**：
    - 运行入口校验 `pr_merged`（检查 sync-queue 文件）
    - 运行入口校验 `issue_exists`（检查 Issue 映射）
-2. **读取完整提示**：参考 `.claude/skills/interview-workflow/prompts/sync-to-knowledge.md` 获取详细步骤
+2. **读取完整提示**：参考 `.claude/skills/sync-to-knowledge/prompts/main.md` 获取详细步骤
 3. **获取 PR 信息**：使用 GitHub MCP 读取 Issue 和 PR 详情
 4. **读取关联文档**：需求文档、OpenSpec 设计文档
 5. **审查代码变更**：读取 PR diff，提取技术实现信息
@@ -40,7 +40,7 @@
 ## 状态感知
 
 - 检查 `.github/lincoln-sync-queue/pr-{pr_number}.yaml` 获取同步任务信息
-- 检查 `.claude/workflow-state.yaml` 获取当前 `session_id` 和 `change_name`
+- 检查 `.claude/workflow-stage.yaml` 获取当前 `session_id` 和 `change_name`
 - 如果 sync-queue 文件状态不是 `pending`，检查是否已处理过
 
 ## 关键产出

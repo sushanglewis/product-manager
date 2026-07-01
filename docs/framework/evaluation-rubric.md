@@ -13,7 +13,7 @@
 **自动检查**：
 
 ```bash
-# 检查 workflow-state.yaml 中所有 completed_stages 是否有对应产物记录
+# 检查 .claude/workflow-stage.yaml 中所有 completed stages 是否有对应产物记录
 python scripts/lincoln-audit.py --dimension traceability
 
 # 检查产物 frontmatter 是否包含 stage / run_id / branch 字段
@@ -22,7 +22,7 @@ python scripts/lincoln-audit.py --check-artifact-frontmatter
 
 **人工抽查要点**：
 - 随机抽取 3 个产物文件，检查 frontmatter 是否包含 `lincoln_stage`、`lincoln_run_id`、`generated_at`
-- 检查 `.claude/workflow-state.yaml` 中的 `completed_stages` 与产物目录结构是否一致
+- 检查 `.claude/workflow-stage.yaml` 中的 `completed_stages` 与产物目录结构是否一致
 - 确认不存在"孤儿产物"（有文件但无阶段记录）或"幽灵阶段"（有记录但无产物）
 
 **判定标准**：
@@ -45,12 +45,12 @@ python scripts/lincoln-audit.py --check-artifact-frontmatter
 # 检查所有 human_gate=true 阶段是否有确认记录
 python scripts/lincoln-audit.py --dimension human-gate
 
-# 检查 stage-manifest.yaml 中 human_gate 标记与 workflow-state.yaml 中确认记录的一致性
+# 检查 stage-manifest.yaml 中 human_gate 标记与 .claude/workflow-stage.yaml 中确认记录的一致性
 python scripts/lincoln-audit.py --check-gate-consistency
 ```
 
 **人工抽查要点**：
-- 检查 `workflow-state.yaml` 中每个 `human_gate: true` 阶段的 `human_confirmed_at` 时间戳是否存在
+- 检查 `.claude/workflow-stage.yaml` 中每个 `human_gate: true` 阶段的 `human_gate_passed` 时间戳是否存在
 - 检查确认时间戳是否合理（不早于阶段开始时间，不晚于下一阶段开始时间）
 - 抽查 1-2 个门控阶段的产物文件，确认内容确实经过人类修改或确认标记
 
@@ -98,12 +98,12 @@ python scripts/lincoln-audit.py --check-format-validity
 
 ### 4. 技能覆盖度（Skill Coverage）
 
-**定义**：每个阶段是否调用了 `skill-routing.yaml` 中声明的 required 技能，optional 技能使用是否合理。
+**定义**：每个阶段是否调用了 `.claude/skills/routing.yaml` 中声明的 required 技能，optional 技能使用是否合理。
 
 **自动检查**：
 
 ```bash
-# 检查 workflow-state.yaml 中 skills_invoked 与 skill-routing.yaml 的一致性
+# 检查 .claude/workflow-stage.yaml 中 skills_invoked 与 .claude/skills/routing.yaml 的一致性
 python scripts/lincoln-audit.py --dimension skill-coverage
 
 # 检查是否有阶段完全未记录技能调用
@@ -132,7 +132,7 @@ python scripts/lincoln-audit.py --check-empty-skill-runs
 **自动检查**：
 
 ```bash
-# 检查 workflow-state.yaml 与 stage-manifest.yaml 的一致性
+# 检查 .claude/workflow-stage.yaml 与 .claude/stages/stage-manifest.yaml 的一致性
 python scripts/lincoln-audit.py --dimension state-consistency
 
 # 检查当前分支状态与 git 历史是否一致（阶段推进是否有对应提交）
@@ -145,7 +145,7 @@ python scripts/lincoln-status.py --format markdown
 
 **人工抽查要点**：
 - 模拟新 Conductor 窗口打开分支，检查 Agent 是否能正确汇报当前阶段
-- 检查 `.claude/workflow-state.yaml` 中的 `current_stage` 与最新 git 提交信息是否一致
+- 检查 `.claude/workflow-stage.yaml` 中的 `current_stage` 与最新 git 提交信息是否一致
 - 检查 `.context/lincoln-handoff.md`（如有）是否包含准确的交接信息
 
 **判定标准**：
@@ -206,7 +206,7 @@ python scripts/lincoln-audit.py --all
 # 2. 人工门控合规性  [PASS]  5/5 门控已确认
 # 3. 产物完整性      [WARN]  23/24 产物完整（designs/xxx/feasibility.md 为空）
 # 4. 技能覆盖度      [PASS]  12/12 阶段有技能记录
-# 5. 状态一致性      [PASS]  workflow-state.yaml 与 git 历史一致
+# 5. 状态一致性      [PASS]  .claude/workflow-stage.yaml 与 git 历史一致
 # 6. GitHub 交接     [PASS]  8/8 Issue/PR 来源完整
 # 
 # 综合评级: PASS (1 项 WARN)

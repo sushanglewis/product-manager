@@ -3,7 +3,7 @@
 ## 入口检查 (Entry Checks)
 
 - [ ] 前置阶段 `split` 状态为 `completed`
-- [ ] 运行入口校验：`python .claude/skills/interview-workflow/validators/validate.py --phase entry --check issues_ready --args <session_id>`
+- [ ] 运行入口校验：`python scripts/validate_stage.py --phase entry --check issues_ready --args <session_id>`
 - [ ] 确认 `.github/linked-issues.yaml` 存在且包含有效 Issue 编号
 - [ ] 确认目标仓库中的 Issues 可访问且状态正确
 
@@ -38,7 +38,7 @@
 
 ## 状态文件更新
 
-- [ ] 更新 `.claude/workflow-state.yaml`：
+- [ ] 更新 `.claude/workflow-stage.yaml`：
   - `stages.implement.status` = `completed`
   - `stages.implement.completed_at` = 当前 ISO 时间
   - `current_run.current_stage` = `sync-knowledge`

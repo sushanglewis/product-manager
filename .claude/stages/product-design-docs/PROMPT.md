@@ -16,7 +16,7 @@
 
 ## 执行指令
 
-1. 读取 `.claude/skills/interview-workflow/prompts/draft-product-design.md` 获取完整执行步骤
+1. 读取 `.claude/skills/draft-product-design/prompts/main.md` 获取完整执行步骤
 2. 确认 `requirements/<session_id>/requirements.md` 已获批准
 3. 读取需求文档包（requirements.md、user-stories.md、prd.md）
 4. （可选）如果设计涉及可借鉴开源方案，调用 `lincoln-explore-opensource` 生成 `docs/research/{change_name}-oss-options.md`，并等待 PM 确认后再继续

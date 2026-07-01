@@ -2,7 +2,7 @@
 
 ## 技能路由
 
-本阶段技能路由定义见 `.claude/skill-routing.yaml`：
+本阶段技能路由定义见 `.claude/skills/routing.yaml`：
 - **required**: `openspec:propose`
 - **optional**: `superpowers:verification-before-completion`, `oh-my-claudecode:verify`
 - **human_gate**: 否
@@ -10,12 +10,12 @@
 ## 主技能命令
 
 - **命令**: `propose-with-openspec`
-- **来源**: `.claude/skills/interview-workflow/skill.yaml`
+- **来源**: `.claude/skills/`
 - **参数**:
   - `session_id` (必填): 访谈会话 ID，如 `2026-06-27-stakeholder`
   - `design_id` (必填): 产品设计 ID，如 `checkout-redesign`
   - `change_name` (必填): OpenSpec 变更名称，短横线命名，如 `add-csv-export`
-- **提示文件**: `.claude/skills/interview-workflow/prompts/propose-with-openspec.md`
+- **提示文件**: `.claude/skills/propose-with-openspec/prompts/main.md`
 
 ## 辅助技能
 
@@ -38,19 +38,19 @@
 
 ## 校验器使用
 
-- **校验器路径**: `.claude/skills/interview-workflow/validators/validate.py`
+- **校验器路径**: `scripts/validate_stage.py`
 - **使用方式**:
   ```bash
   # 准入校验（TDD 计划就绪）
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase entry --check tdd_plan_ready --args {design_id}
 
   # 退出校验（OpenSpec artifact 完整）
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase exit --check openspec_artifact_complete --args {change_name},{design_id}
 
   # 退出校验（任务已提取）
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase exit --check tasks_extracted --args {change_name}
   ```
 

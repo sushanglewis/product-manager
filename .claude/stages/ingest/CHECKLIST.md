@@ -53,7 +53,7 @@
 
 ## 状态文件更新
 
-阶段完成后，更新 `.claude/workflow-state.yaml`：
+阶段完成后，更新 `.claude/workflow-stage.yaml`：
 
 ```yaml
 stages:

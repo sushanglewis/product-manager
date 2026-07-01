@@ -15,7 +15,7 @@ def workflow():
 @pytest.fixture
 def validator_source():
     root = Path(__file__).resolve().parents[1]
-    validator_path = root / ".claude" / "skills" / "interview-workflow" / "validators" / "validate.py"
+    validator_path = root / ".claude" / "skills" / "lincoln-workflow" / "validators" / "validate.py"
     return validator_path.read_text(encoding="utf-8")
 
 
