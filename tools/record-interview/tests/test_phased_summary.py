@@ -1,4 +1,3 @@
-from record_interview.config import Config, SummarizationConfig
 from record_interview.metadata import read_metadata
 from record_interview.phased_summary import PhasedSummaryGenerator
 

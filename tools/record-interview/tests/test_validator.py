@@ -1,5 +1,4 @@
 import pytest
-from pathlib import Path
 
 from record_interview.worktree import WorktreeError
 from record_interview.validator import validate_session_id, resolve_workspace_root

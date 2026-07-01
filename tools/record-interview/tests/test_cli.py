@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from record_interview.cli import run_recording_flow

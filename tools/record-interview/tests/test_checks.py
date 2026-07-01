@@ -4,6 +4,7 @@ from record_interview.checks import (
     check_microphone,
     check_summarization,
     check_transcription,
+    request_microphone_permission,
     run_setup_checks,
 )
 from record_interview.config import Config, DiarizationConfig, SummarizationConfig, TranscriptionConfig
@@ -158,3 +159,74 @@ def test_run_setup_checks_returns_all_keys(mocker):
     mocker.patch("record_interview.checks.check_summarization", return_value=(True, "ok"))
     result = run_setup_checks(Config())
     assert set(result.keys()) == {"ffmpeg", "microphone", "transcription", "diarization", "summarization"}
+
+
+def test_request_microphone_permission_non_macos(mocker):
+    mocker.patch("platform.system", return_value="Linux")
+    assert request_microphone_permission() is False
+
+
+def test_request_microphone_permission_import_error_on_macos(mocker):
+    mocker.patch("platform.system", return_value="Darwin")
+    mocker.patch.dict("sys.modules", {"AVFoundation": None}, clear=False)
+    assert request_microphone_permission() is False
+
+
+def test_request_microphone_permission_already_authorized_on_macos(mocker):
+    mocker.patch("platform.system", return_value="Darwin")
+    device_cls = mocker.MagicMock()
+    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=3)
+    mocker.patch.dict(
+        "sys.modules",
+        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
+    )
+    assert request_microphone_permission() is True
+
+
+def test_request_microphone_permission_restricted_on_macos(mocker):
+    mocker.patch("platform.system", return_value="Darwin")
+    device_cls = mocker.MagicMock()
+    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=1)
+    mocker.patch.dict(
+        "sys.modules",
+        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
+    )
+    assert request_microphone_permission() is False
+
+
+def test_request_microphone_permission_granted_after_request_on_macos(mocker):
+    mocker.patch("platform.system", return_value="Darwin")
+    device_cls = mocker.MagicMock()
+    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=0)
+
+    def _request_access(media_type, completion):
+        completion(True)
+
+    device_cls.requestAccessForMediaType_completionHandler_ = mocker.MagicMock(side_effect=_request_access)
+    mocker.patch.dict(
+        "sys.modules",
+        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
+    )
+    assert request_microphone_permission(timeout_seconds=1.0) is True
+
+
+def test_request_microphone_permission_times_out_when_no_completion_on_macos(mocker):
+    mocker.patch("platform.system", return_value="Darwin")
+    device_cls = mocker.MagicMock()
+    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=0)
+    mocker.patch.dict(
+        "sys.modules",
+        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
+    )
+    assert request_microphone_permission(timeout_seconds=0.01) is False
+
+
+def test_request_microphone_permission_swallows_avfoundation_errors(mocker):
+    mocker.patch("platform.system", return_value="Darwin")
+    device_cls = mocker.MagicMock()
+    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(side_effect=RuntimeError("boom"))
+    mocker.patch.dict(
+        "sys.modules",
+        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
+    )
+    assert request_microphone_permission() is False

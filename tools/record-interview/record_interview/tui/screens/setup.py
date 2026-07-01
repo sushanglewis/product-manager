@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import asyncio
+
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
-from textual.widgets import Button, Label, Static
+from textual.widgets import Button, Static
 
-from record_interview.checks import run_setup_checks
+from record_interview.checks import request_microphone_permission, run_setup_checks
 from record_interview.metadata import build_metadata, write_metadata
 
 
@@ -15,6 +17,7 @@ class SetupScreen(Screen):
     def __init__(self) -> None:
         super().__init__()
         self._checks: dict[str, tuple[bool, str]] = {}
+        self._requested_permission = False
 
     def compose(self) -> ComposeResult:
         yield Static("Lincoln Interview Recorder", id="title")
@@ -30,6 +33,22 @@ class SetupScreen(Screen):
     def _run_checks(self) -> None:
         app = self.app
         self._checks = run_setup_checks(app.config)
+        mic_ready, _ = self._checks.get("microphone", (False, ""))
+        if not mic_ready and not self._requested_permission:
+            self._requested_permission = True
+            status = self.query_one("#status", Static)
+            status.update("Requesting microphone permission...")
+            asyncio.create_task(self._request_permission_and_recheck())
+            return
+        self._render_checks()
+
+    async def _request_permission_and_recheck(self) -> None:
+        try:
+            granted = await asyncio.to_thread(request_microphone_permission)
+        except Exception:  # noqa: BLE001
+            granted = False
+        if granted:
+            self._checks = run_setup_checks(self.app.config)
         self._render_checks()
 
     def _render_checks(self) -> None:

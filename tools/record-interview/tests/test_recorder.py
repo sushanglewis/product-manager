@@ -108,7 +108,7 @@ def test_start_raises_when_ffmpeg_fails_to_start(mock_popen, mock_which):
     mock_popen.return_value = mock_proc
 
     recorder = FfmpegRecorder(sample_rate=44100)
-    with pytest.raises(RecordingError, match="ffmpeg failed to start: Permission denied"):
+    with pytest.raises(RecordingError, match="ffmpeg failed to start"):
         recorder.start(Path("/tmp/test.m4a"))
     assert recorder._process is None
     assert recorder._started_at is None

@@ -1,4 +1,3 @@
-import pytest
 
 from record_interview.errors import (
     ApiKeyMissingError,

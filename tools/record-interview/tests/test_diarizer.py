@@ -46,7 +46,7 @@ def test_build_diarizer_pyannote_with_token(mocker):
         },
     )
     cfg = Config(diarization=DiarizationConfig(provider="pyannote", huggingface_token="hf-token"))
-    diarizer = build_diarizer(cfg)
+    build_diarizer(cfg)
     pipeline_cls.from_pretrained.assert_called_once()
 
 

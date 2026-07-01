@@ -5,9 +5,10 @@ import sys
 from pathlib import Path
 
 from record_interview.config import Config, load_config
+from record_interview.errors import GuidanceError
 from record_interview.metadata import build_metadata, update_recording_complete, write_metadata
 from record_interview.process import trigger_process_interview
-from record_interview.recorder import FfmpegRecorder
+from record_interview.recorder import FfmpegRecorder, RecordingError
 from record_interview.tui.app import LincolnRecordApp
 from record_interview.validator import resolve_workspace_root, validate_session_id
 
@@ -118,8 +119,13 @@ def main(argv: list[str] | None = None) -> int:
             branch=args.branch,
             no_confirm=args.no_confirm,
         )
-    except Exception as e:
+    except (GuidanceError, RecordingError) as e:
         print(f"Error: {e}", file=sys.stderr)
+        if isinstance(e, GuidanceError):
+            print(f"Fix: {e.remediation}", file=sys.stderr)
+        return 1
+    except Exception:  # noqa: BLE001
+        print("An unexpected error occurred. Check the logs for details.", file=sys.stderr)
         return 1
 
 

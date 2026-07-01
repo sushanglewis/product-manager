@@ -1,6 +1,5 @@
 import pytest
 import pytest_asyncio
-from pathlib import Path
 
 from record_interview.config import Config, DiarizationConfig, SummarizationConfig, TranscriptionConfig
 from record_interview.tui.app import LincolnRecordApp

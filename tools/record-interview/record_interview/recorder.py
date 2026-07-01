@@ -1,12 +1,15 @@
 # tools/record-interview/record_interview/recorder.py
 from __future__ import annotations
 
+import logging
 import queue
 import shutil
 import subprocess
 import threading
 import time
 from pathlib import Path
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class RecordingError(Exception):
@@ -52,7 +55,8 @@ class FfmpegRecorder:
             stderr = self._process.stderr.read() if self._process.stderr else ""
             self._process = None
             self._started_at = None
-            raise RecordingError(f"ffmpeg failed to start: {stderr}")
+            _LOGGER.warning("ffmpeg failed to start: %s", stderr)
+            raise RecordingError("ffmpeg failed to start. Check the logs for details.")
 
     def stop(self) -> int:
         if self._process is None:
@@ -75,7 +79,10 @@ class FfmpegRecorder:
             # it has already flushed the output. Treat that as a successful stop.
             if "Exiting normally" in stderr:
                 return duration
-            raise RecordingError(f"ffmpeg exited with code {returncode}: {stderr}")
+            _LOGGER.warning("ffmpeg exited with code %s: %s", returncode, stderr)
+            raise RecordingError(
+                f"ffmpeg exited with code {returncode}. Check the logs for details."
+            )
         return duration
 
     def is_recording(self) -> bool:
@@ -145,7 +152,8 @@ class ChunkedRecorder:
             stderr = self._process.stderr.read() if self._process.stderr else ""
             self._process = None
             self._running = False
-            raise RecordingError(f"ffmpeg failed to start: {stderr}")
+            _LOGGER.warning("ffmpeg failed to start: %s", stderr)
+            raise RecordingError("ffmpeg failed to start. Check the logs for details.")
 
     def stop(self) -> int:
         if self._process is None:
@@ -167,7 +175,10 @@ class ChunkedRecorder:
             self._watcher_thread.join(timeout=2)
 
         if returncode != 0 and "Exiting normally" not in stderr:
-            raise RecordingError(f"ffmpeg exited with code {returncode}: {stderr}")
+            _LOGGER.warning("ffmpeg exited with code %s: %s", returncode, stderr)
+            raise RecordingError(
+                f"ffmpeg exited with code {returncode}. Check the logs for details."
+            )
         return duration
 
     def is_recording(self) -> bool:

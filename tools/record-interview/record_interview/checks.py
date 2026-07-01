@@ -1,16 +1,67 @@
 from __future__ import annotations
 
+import logging
+import platform
 import shutil
 import subprocess
-from pathlib import Path
+import threading
 
 from record_interview.config import Config
+
+_LOGGER = logging.getLogger(__name__)
+
+# AVAuthorizationStatus raw values on macOS / iOS.
+_AV_AUTHORIZATION_NOT_DETERMINED = 0
+_AV_AUTHORIZATION_RESTRICTED = 1
+_AV_AUTHORIZATION_DENIED = 2
+_AV_AUTHORIZATION_AUTHORIZED = 3
 
 
 def check_ffmpeg() -> tuple[bool, str]:
     if shutil.which("ffmpeg"):
         return True, "ffmpeg is available"
     return False, "ffmpeg not found in PATH. Install with: brew install ffmpeg"
+
+
+def request_microphone_permission(timeout_seconds: float = 30.0) -> bool:
+    """Request macOS microphone permission and return whether it was granted.
+
+    On non-macOS platforms this returns False immediately.
+    """
+    if platform.system() != "Darwin":
+        return False
+    try:
+        from AVFoundation import (  # type: ignore[import-untyped]
+            AVCaptureDevice,
+            AVMediaTypeAudio,
+        )
+    except ImportError:
+        return False
+
+    try:
+        status = AVCaptureDevice.authorizationStatusForMediaType_(AVMediaTypeAudio)
+        if status == _AV_AUTHORIZATION_AUTHORIZED:
+            return True
+        if status == _AV_AUTHORIZATION_DENIED:
+            return False
+
+        event = threading.Event()
+        granted = False
+
+        def completion(is_granted: bool) -> None:
+            nonlocal granted
+            if event.is_set():
+                return
+            granted = is_granted
+            event.set()
+
+        AVCaptureDevice.requestAccessForMediaType_completionHandler_(
+            AVMediaTypeAudio, completion
+        )
+        return event.wait(timeout=timeout_seconds) and granted
+    except Exception as exc:  # noqa: BLE001
+        _LOGGER.warning("Failed to request microphone permission: %s", exc)
+        return False
 
 
 def _list_avfoundation_devices() -> str:

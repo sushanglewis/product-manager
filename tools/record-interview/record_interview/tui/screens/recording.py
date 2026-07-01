@@ -4,10 +4,10 @@ import time
 from pathlib import Path
 
 from textual.app import ComposeResult
-from textual.containers import Horizontal, Vertical
+from textual.containers import Horizontal
 from textual.reactive import reactive
 from textual.screen import Screen
-from textual.widgets import Button, Label, Log, Static
+from textual.widgets import Button, Log, Static
 
 from record_interview.metadata import update_recording_complete
 from record_interview.pipeline import PipelineSegment, TranscriptionPipeline

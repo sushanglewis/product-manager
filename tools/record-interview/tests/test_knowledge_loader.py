@@ -1,4 +1,3 @@
-from pathlib import Path
 
 from record_interview.knowledge_loader import (
     build_knowledge_context,
