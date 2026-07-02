@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://lincoln-framework.dev/schemas/agent-definition.schema.json",
+  "title": "Lincoln Agent Definition Schema",
+  "description": "Validates agent markdown files under .claude/agents/.",
+  "type": "object",
+  "required": ["name", "description"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique agent identifier"
+    },
+    "description": {
+      "type": "string",
+      "description": "Short description of the agent's role"
+    },
+    "extends": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of agent files this agent extends"
+    },
+    "model": {
+      "type": "string",
+      "enum": ["haiku", "sonnet", "opus"]
+    },
+    "tools": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "disallowed_tools": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

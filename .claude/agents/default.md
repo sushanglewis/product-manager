@@ -1,3 +1,8 @@
+---
+name: lincoln-default
+description: Lincoln 默认 Agent 行为规范，所有 Lincoln Agent 必须先阅读
+---
+
 # Agent 行为规范
 
 本文件定义了在 Lincoln 工作流模板中，Claude Code Agent 必须遵守的行为准则。所有 Agent 在操作本项目前必须先阅读本文件。
@@ -16,7 +21,7 @@
 
 Agent 进入会话后，应首先确认当前分支和阶段：
 
-1. 读取 `.claude/workflow-state.yaml` 了解 `current_run.current_stage`；
+1. 读取 `.claude/workflow-stage.yaml` 了解 `current_run.current_stage`；
 2. 若当前阶段不是 `not_started`，优先阅读 `.claude/stages/<current_stage>/AGENTS.md`、`CHECKLIST.md`、`SKILLS.md`；
 3. 使用 `scripts/stage_loader.py --stage <stage> --action validate-entry` 运行准入校验；
 4. 若 everything-claude-code hooks 已启用，hook 会自动拦截未通过准入校验的副作用工具；若 hooks 未启用，必须手动执行校验，禁止绕过。
@@ -154,9 +159,9 @@ Lincoln 各阶段可调用以下子技能补充方法论：
 
 每个步骤执行前后必须调用统一 validator runner：
 
-- runner：`.claude/skills/interview-workflow/validators/validate.py`
-- entry check：`python .claude/skills/interview-workflow/validators/validate.py --phase entry --check <name> --args <comma-separated-args>`
-- exit check：`python .claude/skills/interview-workflow/validators/validate.py --phase exit --check <name> --args <comma-separated-args>`
+- runner：`scripts/validate_stage.py`
+- entry check：`python scripts/validate_stage.py --phase entry --check <name> --args <comma-separated-args>`
+- exit check：`python scripts/validate_stage.py --phase exit --check <name> --args <comma-separated-args>`
 
 校验失败时：
 1. 立即停止当前 loop

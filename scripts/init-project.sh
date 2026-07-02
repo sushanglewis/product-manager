@@ -98,7 +98,7 @@ echo "✅ OpenSpec config valid"
 # ---------------------------------------------------------------------------
 # 5. Make validator executable
 # ---------------------------------------------------------------------------
-VALIDATOR=".claude/skills/interview-workflow/validators/validate.py"
+VALIDATOR="scripts/validate_stage.py"
 if [ -f "$VALIDATOR" ]; then
   chmod +x "$VALIDATOR"
   echo "✅ Validator made executable"
@@ -128,8 +128,7 @@ else
     requirements/.gitkeep \
     designs/.gitkeep \
     openspec/changes/.gitkeep \
-    docs/knowledge/assets/.gitkeep \
-    "$VALIDATOR"
+    docs/knowledge/assets/.gitkeep
   if git diff --cached --quiet; then
     echo "ℹ️  No tracked initialization changes to commit"
   else
@@ -143,4 +142,4 @@ echo "🎉 Lincoln project initialized successfully!"
 echo ""
 echo "Next steps:"
 echo "  1. Place an interview recording in recordings/"
-echo "  2. Run: claude process-interview recordings/<file>"
+echo "  2. Say to Claude Code: '处理一下这个访谈录音 recordings/<file>'"

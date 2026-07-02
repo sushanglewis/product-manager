@@ -16,7 +16,7 @@
 
 ## 执行指令
 
-1. 读取 `.claude/skills/interview-workflow/prompts/build-product-prototype.md` 获取完整执行步骤
+1. 读取 `.claude/skills/build-product-prototype/prompts/main.md` 获取完整执行步骤
 2. 确认 `designs/<design_id>/design-review.md` 已获批准
 3. 读取 `designs/<design_id>/` 下的全部设计文档
 4. 创建 `fields.md`（字段规格）和 `ui-spec.md`（UI 规格）

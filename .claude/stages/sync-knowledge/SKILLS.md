@@ -2,7 +2,7 @@
 
 ## 技能路由
 
-本阶段技能路由定义见 `.claude/skill-routing.yaml`：
+本阶段技能路由定义见 `.claude/skills/routing.yaml`：
 - **required**: `gsd:docs-update`
 - **optional**: `gsd:forensics`, `gsd:milestone-summary`, `openspec:sync-specs`, `oh-my-claudecode:wiki`, `oh-my-claudecode:writer-memory`, `superpowers:verification-before-completion`
 - **human_gate**: 否
@@ -49,12 +49,12 @@ claude sync-to-knowledge <issue_number> <pr_number>
 
 入口校验：
 ```bash
-python .claude/skills/interview-workflow/validators/validate.py \
+python scripts/validate_stage.py \
   --phase entry \
   --check pr_merged \
   --args <pr_number>
 
-python .claude/skills/interview-workflow/validators/validate.py \
+python scripts/validate_stage.py \
   --phase entry \
   --check issue_exists \
   --args <issue_number>
@@ -62,17 +62,17 @@ python .claude/skills/interview-workflow/validators/validate.py \
 
 退出校验：
 ```bash
-python .claude/skills/interview-workflow/validators/validate.py \
+python scripts/validate_stage.py \
   --phase exit \
   --check feature_doc_has_business_and_technical_sections \
   --args <feature_slug>
 
-python .claude/skills/interview-workflow/validators/validate.py \
+python scripts/validate_stage.py \
   --phase exit \
   --check feature_doc_has_links \
   --args <feature_slug>
 
-python .claude/skills/interview-workflow/validators/validate.py \
+python scripts/validate_stage.py \
   --phase exit \
   --check no_conflict_with_existing_knowledge \
   --args <feature_slug>

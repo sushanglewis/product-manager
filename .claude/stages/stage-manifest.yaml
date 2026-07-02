@@ -1,258 +1,448 @@
----
 schema_version: 1.0.0
-description: |
-  Stage metadata index for the Lincoln workflow framework.
+description: 'Stage metadata index for the Lincoln workflow framework.
+
   Each stage declares its identity, gate policy, artifact requirements,
+
   skill routing reference, context files, and stage transitions.
+
   Consumed by stage_loader.py, lincoln-status.py, and lincoln-audit.py.
 
+
   Note: `test/verify` and `ship` are conceptual stages used in
+
   skill-routing.yaml for capability mapping; they do not have physical
+
   stage directories and are therefore omitted from this manifest.
 
+  '
 stages:
-  - id: workflow-router
-    name: Workflow Router
-    description: |
-      Entry point. Assesses repository context, selects the most
-      appropriate workflow template, and initializes workflow-state.
-    human_gate: true
-    template: all
-    prerequisite_stage: null
-    required_artifacts:
-      - .claude/workflow-state.yaml
-    required_skills: workflow-router
-    context_files:
-      agents_md: .claude/stages/workflow-router/AGENTS.md
-      checklist_md: .claude/stages/workflow-router/CHECKLIST.md
-      skills_md: .claude/stages/workflow-router/SKILLS.md
-      prompt_md: .claude/stages/workflow-router/PROMPT.md
-    next_stage: null
+- id: workflow-router
+  name: Workflow Router
+  description: 'Entry point. Assesses repository context, selects the most
 
-  - id: ingest
-    name: Ingest
-    description: |
-      Ingests raw interview recordings and produces transcripts,
-      summaries, and raw insights.
-    human_gate: false
-    template:
-      - interview-to-knowledge
-    prerequisite_stage: workflow-router
-    required_artifacts:
-      - "interviews/{session_id}/metadata.json"
-      - "interviews/{session_id}/transcript.md"
-      - "interviews/{session_id}/summary.md"
-      - "interviews/{session_id}/raw-insights.md"
-    required_skills: ingest
-    context_files:
-      agents_md: .claude/stages/ingest/AGENTS.md
-      checklist_md: .claude/stages/ingest/CHECKLIST.md
-      skills_md: .claude/stages/ingest/SKILLS.md
-      prompt_md: .claude/stages/ingest/PROMPT.md
-    next_stage: clarify
+    appropriate workflow template, and initializes workflow-state.
 
-  - id: build-codebase-knowledge
-    name: Build Codebase Knowledge
-    description: |
-      Scans existing source code and builds knowledge base
-      for projects entering Lincoln with existing code but no
-      feature knowledge base. Triggered by existing-project-iteration
-      template after workflow-router.
-    human_gate: false
-    template:
-      - existing-project-iteration
-    prerequisite_stage: workflow-router
-    required_artifacts:
-      - "docs/knowledge/00-index.md"
-    required_skills: build-codebase-knowledge
-    context_files:
-      agents_md: .claude/stages/build-codebase-knowledge/AGENTS.md
-      checklist_md: .claude/stages/build-codebase-knowledge/CHECKLIST.md
-      skills_md: .claude/stages/build-codebase-knowledge/SKILLS.md
-      prompt_md: .claude/stages/build-codebase-knowledge/PROMPT.md
-    next_stage: clarify
+    '
+  human_gate: true
+  template: all
+  prerequisite_stage: null
+  required_artifacts:
+  - .claude/workflow-stage.yaml
+  required_skills: workflow-router
+  context_files:
+    agents_md: .claude/stages/workflow-router/AGENTS.md
+    checklist_md: .claude/stages/workflow-router/CHECKLIST.md
+    skills_md: .claude/stages/workflow-router/SKILLS.md
+    prompt_md: .claude/stages/workflow-router/PROMPT.md
+  next_stage: null
+  gates:
+    entry: []
+    exit:
+    - check: artifact_exists
+      args:
+      - .claude/workflow-stage.yaml
+- id: ingest
+  name: Ingest
+  description: 'Ingests raw interview recordings and produces transcripts,
 
-  - id: clarify
-    name: Clarify
-    description: |
-      Explores requirements, resolves ambiguity, and produces
-      confirmed requirements before design work begins.
-    human_gate: true
-    template: all
-    prerequisite_stage: ingest
-    required_artifacts:
-      - "requirements/{session_id}/requirements.md"
-      - "requirements/{session_id}/user-stories.md"
-      - "requirements/{session_id}/prd.md"
-    required_skills: clarify
-    context_files:
-      agents_md: .claude/stages/clarify/AGENTS.md
-      checklist_md: .claude/stages/clarify/CHECKLIST.md
-      skills_md: .claude/stages/clarify/SKILLS.md
-      prompt_md: .claude/stages/clarify/PROMPT.md
-    next_stage: product-design-docs
+    summaries, and raw insights.
 
-  - id: explore-opensource
-    name: Explore Open Source
-    description: |
-      Researches existing open-source projects that can inform
-      or solve the current requirement. Triggered by oss-first-design
-      template after clarify.
-    human_gate: false
-    template:
-      - oss-first-design
-    prerequisite_stage: clarify
-    required_artifacts:
-      - "docs/research/{change_name}-oss-options.md"
-    required_skills: explore-opensource
-    context_files:
-      agents_md: .claude/stages/explore-opensource/AGENTS.md
-      checklist_md: .claude/stages/explore-opensource/CHECKLIST.md
-      skills_md: .claude/stages/explore-opensource/SKILLS.md
-      prompt_md: .claude/stages/explore-opensource/PROMPT.md
-    next_stage: product-design-docs
+    '
+  human_gate: false
+  template:
+  - interview-to-knowledge
+  prerequisite_stage: workflow-router
+  required_artifacts:
+  - interviews/{session_id}/metadata.json
+  - interviews/{session_id}/transcript.md
+  - interviews/{session_id}/summary.md
+  - interviews/{session_id}/raw-insights.md
+  required_skills: ingest
+  context_files:
+    agents_md: .claude/stages/ingest/AGENTS.md
+    checklist_md: .claude/stages/ingest/CHECKLIST.md
+    skills_md: .claude/stages/ingest/SKILLS.md
+    prompt_md: .claude/stages/ingest/PROMPT.md
+  next_stage: clarify
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - workflow-router
+    exit:
+    - check: artifact_exists
+      args:
+      - interviews/{session_id}/metadata.json
+    - check: artifact_exists
+      args:
+      - interviews/{session_id}/transcript.md
+    - check: artifact_exists
+      args:
+      - interviews/{session_id}/summary.md
+    - check: artifact_exists
+      args:
+      - interviews/{session_id}/raw-insights.md
+- id: build-codebase-knowledge
+  name: Build Codebase Knowledge
+  description: 'Scans existing source code and builds knowledge base
 
-  - id: product-design-docs
-    name: Product Design Docs
-    description: |
-      Produces the design-review package based on confirmed
-      requirements. May include early OpenSpec drafts.
-    human_gate: true
-    template: all
-    prerequisite_stage: clarify
-    required_artifacts:
-      - "designs/{design_id}/design-review.md"
-      - "designs/{design_id}/scenarios.md"
-      - "designs/{design_id}/feature-catalog.md"
-      - "designs/{design_id}/data-model.md"
-      - "designs/{design_id}/flows.md"
-      - "designs/{design_id}/feasibility.md"
-    required_skills: product-design-docs
-    context_files:
-      agents_md: .claude/stages/product-design-docs/AGENTS.md
-      checklist_md: .claude/stages/product-design-docs/CHECKLIST.md
-      skills_md: .claude/stages/product-design-docs/SKILLS.md
-      prompt_md: .claude/stages/product-design-docs/PROMPT.md
-    next_stage: product-prototype
+    for projects entering Lincoln with existing code but no
 
-  - id: product-prototype
-    name: Product Prototype
-    description: |
-      Generates UI specs, field specs, and Pencil prototypes.
-    human_gate: true
-    template:
-      - interview-to-knowledge
-      - existing-project-iteration
-      - design-spike
-      - oss-first-design
-    prerequisite_stage: product-design-docs
-    required_artifacts:
-      - "designs/{design_id}/ui-spec.md"
-      - "designs/{design_id}/fields.md"
-      - "designs/{design_id}/prototype.pen"
-    required_skills: product-prototype
-    context_files:
-      agents_md: .claude/stages/product-prototype/AGENTS.md
-      checklist_md: .claude/stages/product-prototype/CHECKLIST.md
-      skills_md: .claude/stages/product-prototype/SKILLS.md
-      prompt_md: .claude/stages/product-prototype/PROMPT.md
-    next_stage: tdd-development-plan
+    feature knowledge base. Triggered by existing-project-iteration
 
-  - id: tdd-development-plan
-    name: TDD Development Plan
-    description: |
-      Produces tdd-plan.md with red/green/refactor sequences,
-      test scenarios, and task slices ready for OpenSpec proposal.
-    human_gate: false
-    template: all
-    prerequisite_stage: product-prototype
-    required_artifacts:
-      - "designs/{design_id}/tdd-plan.md"
-    required_skills: tdd-development-plan
-    context_files:
-      agents_md: .claude/stages/tdd-development-plan/AGENTS.md
-      checklist_md: .claude/stages/tdd-development-plan/CHECKLIST.md
-      skills_md: .claude/stages/tdd-development-plan/SKILLS.md
-      prompt_md: .claude/stages/tdd-development-plan/PROMPT.md
-    next_stage: propose
+    template after workflow-router.
 
-  - id: propose
-    name: Propose
-    description: |
-      Generates a complete OpenSpec change proposal including
-      proposal.md, design.md, tasks.md, and specs/ directory.
-    human_gate: false
-    template: all
-    prerequisite_stage: tdd-development-plan
-    required_artifacts:
-      - "openspec/changes/{change_name}/proposal.md"
-      - "openspec/changes/{change_name}/design.md"
-      - "openspec/changes/{change_name}/tasks.md"
-      - "openspec/changes/{change_name}/specs/"
-    required_skills: propose
-    context_files:
-      agents_md: .claude/stages/propose/AGENTS.md
-      checklist_md: .claude/stages/propose/CHECKLIST.md
-      skills_md: .claude/stages/propose/SKILLS.md
-      prompt_md: .claude/stages/propose/PROMPT.md
-    next_stage: split
+    '
+  human_gate: false
+  template:
+  - existing-project-iteration
+  prerequisite_stage: workflow-router
+  required_artifacts:
+  - docs/knowledge/00-index.md
+  required_skills: build-codebase-knowledge
+  context_files:
+    agents_md: .claude/stages/build-codebase-knowledge/AGENTS.md
+    checklist_md: .claude/stages/build-codebase-knowledge/CHECKLIST.md
+    skills_md: .claude/stages/build-codebase-knowledge/SKILLS.md
+    prompt_md: .claude/stages/build-codebase-knowledge/PROMPT.md
+  next_stage: clarify
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - workflow-router
+    exit:
+    - check: artifact_exists
+      args:
+      - docs/knowledge/00-index.md
+- id: clarify
+  name: Clarify
+  description: 'Explores requirements, resolves ambiguity, and produces
 
-  - id: split
-    name: Split
-    description: |
-      Breaks OpenSpec tasks into parallel, independently implementable
-      GitHub Issues with clear boundaries and acceptance criteria.
-    human_gate: false
-    template: all
-    prerequisite_stage: propose
-    required_artifacts:
-      - ".github/linked-issues.yaml"
-    required_skills: split
-    context_files:
-      agents_md: .claude/stages/split/AGENTS.md
-      checklist_md: .claude/stages/split/CHECKLIST.md
-      skills_md: .claude/stages/split/SKILLS.md
-      prompt_md: .claude/stages/split/PROMPT.md
-    next_stage: implement
+    confirmed requirements before design work begins.
 
-  - id: implement
-    name: Implement
-    description: |
-      Core implementation stage. Engineering executes tasks with TDD
-      discipline, code review, and PR submission. Lincoln pauses here
-      for human engineering work; test/verify and ship occur within
-      this stage or as follow-up PR lifecycle steps.
-    human_gate: true
-    template: all
-    prerequisite_stage: split
-    required_artifacts: []
-    required_skills: implement
-    context_files:
-      agents_md: .claude/stages/implement/AGENTS.md
-      checklist_md: .claude/stages/implement/CHECKLIST.md
-      skills_md: .claude/stages/implement/SKILLS.md
-      prompt_md: .claude/stages/implement/PROMPT.md
-    next_stage: sync-knowledge
+    '
+  human_gate: true
+  template: all
+  prerequisite_stage: ingest
+  required_artifacts:
+  - requirements/{session_id}/requirements.md
+  - requirements/{session_id}/user-stories.md
+  - requirements/{session_id}/prd.md
+  required_skills: clarify
+  context_files:
+    agents_md: .claude/stages/clarify/AGENTS.md
+    checklist_md: .claude/stages/clarify/CHECKLIST.md
+    skills_md: .claude/stages/clarify/SKILLS.md
+    prompt_md: .claude/stages/clarify/PROMPT.md
+  next_stage: product-design-docs
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - ingest
+    exit:
+    - check: artifact_exists
+      args:
+      - requirements/{session_id}/requirements.md
+    - check: artifact_exists
+      args:
+      - requirements/{session_id}/user-stories.md
+    - check: artifact_exists
+      args:
+      - requirements/{session_id}/prd.md
+    - check: human_approved
+    - check: gate_review_passed
+- id: explore-opensource
+  name: Explore Open Source
+  description: 'Researches existing open-source projects that can inform
 
-  - id: sync-knowledge
-    name: Sync Knowledge
-    description: |
-      After PR merge, updates Obsidian vault and archives milestone
-      artifacts, generating feature docs, decision docs, and interview
-      summaries.
-    human_gate: false
-    template: all
-    prerequisite_stage: implement
-    required_artifacts:
-      - ".github/lincoln-sync-queue/pr-{pr_number}.yaml"
-      - "docs/knowledge/01-interviews/{session_id}.md"
-      - "docs/knowledge/02-requirements/{requirement_id}.md"
-      - "docs/knowledge/03-features/{feature_slug}.md"
-      - "docs/knowledge/04-decisions/{decision_id}.md"
-    required_skills: sync-knowledge
-    context_files:
-      agents_md: .claude/stages/sync-knowledge/AGENTS.md
-      checklist_md: .claude/stages/sync-knowledge/CHECKLIST.md
-      skills_md: .claude/stages/sync-knowledge/SKILLS.md
-      prompt_md: .claude/stages/sync-knowledge/PROMPT.md
-    next_stage: null
+    or solve the current requirement. Triggered by oss-first-design
+
+    template after clarify.
+
+    '
+  human_gate: false
+  template:
+  - oss-first-design
+  prerequisite_stage: clarify
+  required_artifacts:
+  - docs/research/{change_name}-oss-options.md
+  required_skills: explore-opensource
+  context_files:
+    agents_md: .claude/stages/explore-opensource/AGENTS.md
+    checklist_md: .claude/stages/explore-opensource/CHECKLIST.md
+    skills_md: .claude/stages/explore-opensource/SKILLS.md
+    prompt_md: .claude/stages/explore-opensource/PROMPT.md
+  next_stage: product-design-docs
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - clarify
+    exit:
+    - check: artifact_exists
+      args:
+      - docs/research/{change_name}-oss-options.md
+- id: product-design-docs
+  name: Product Design Docs
+  description: 'Produces the design-review package based on confirmed
+
+    requirements. May include early OpenSpec drafts.
+
+    '
+  human_gate: true
+  template: all
+  prerequisite_stage: clarify
+  required_artifacts:
+  - designs/{design_id}/design-review.md
+  - designs/{design_id}/scenarios.md
+  - designs/{design_id}/feature-catalog.md
+  - designs/{design_id}/data-model.md
+  - designs/{design_id}/flows.md
+  - designs/{design_id}/feasibility.md
+  required_skills: product-design-docs
+  context_files:
+    agents_md: .claude/stages/product-design-docs/AGENTS.md
+    checklist_md: .claude/stages/product-design-docs/CHECKLIST.md
+    skills_md: .claude/stages/product-design-docs/SKILLS.md
+    prompt_md: .claude/stages/product-design-docs/PROMPT.md
+  next_stage: product-prototype
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - clarify
+    exit:
+    - check: artifact_exists
+      args:
+      - designs/{design_id}/design-review.md
+    - check: artifact_exists
+      args:
+      - designs/{design_id}/scenarios.md
+    - check: artifact_exists
+      args:
+      - designs/{design_id}/feature-catalog.md
+    - check: artifact_exists
+      args:
+      - designs/{design_id}/data-model.md
+    - check: artifact_exists
+      args:
+      - designs/{design_id}/flows.md
+    - check: artifact_exists
+      args:
+      - designs/{design_id}/feasibility.md
+    - check: human_approved
+    - check: gate_review_passed
+- id: product-prototype
+  name: Product Prototype
+  description: 'Generates UI specs, field specs, and Pencil prototypes.
+
+    '
+  human_gate: true
+  template:
+  - interview-to-knowledge
+  - existing-project-iteration
+  - design-spike
+  - oss-first-design
+  prerequisite_stage: product-design-docs
+  required_artifacts:
+  - designs/{design_id}/ui-spec.md
+  - designs/{design_id}/fields.md
+  - designs/{design_id}/prototype.pen
+  required_skills: product-prototype
+  context_files:
+    agents_md: .claude/stages/product-prototype/AGENTS.md
+    checklist_md: .claude/stages/product-prototype/CHECKLIST.md
+    skills_md: .claude/stages/product-prototype/SKILLS.md
+    prompt_md: .claude/stages/product-prototype/PROMPT.md
+  next_stage: tdd-development-plan
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - product-design-docs
+    exit:
+    - check: artifact_exists
+      args:
+      - designs/{design_id}/ui-spec.md
+    - check: artifact_exists
+      args:
+      - designs/{design_id}/fields.md
+    - check: artifact_exists
+      args:
+      - designs/{design_id}/prototype.pen
+    - check: human_approved
+    - check: gate_review_passed
+- id: tdd-development-plan
+  name: TDD Development Plan
+  description: 'Produces tdd-plan.md with red/green/refactor sequences,
+
+    test scenarios, and task slices ready for OpenSpec proposal.
+
+    '
+  human_gate: false
+  template: all
+  prerequisite_stage: product-prototype
+  required_artifacts:
+  - designs/{design_id}/tdd-plan.md
+  required_skills: tdd-development-plan
+  context_files:
+    agents_md: .claude/stages/tdd-development-plan/AGENTS.md
+    checklist_md: .claude/stages/tdd-development-plan/CHECKLIST.md
+    skills_md: .claude/stages/tdd-development-plan/SKILLS.md
+    prompt_md: .claude/stages/tdd-development-plan/PROMPT.md
+  next_stage: propose
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - product-prototype
+    exit:
+    - check: artifact_exists
+      args:
+      - designs/{design_id}/tdd-plan.md
+- id: propose
+  name: Propose
+  description: 'Generates a complete OpenSpec change proposal including
+
+    proposal.md, design.md, tasks.md, and specs/ directory.
+
+    '
+  human_gate: false
+  template: all
+  prerequisite_stage: tdd-development-plan
+  required_artifacts:
+  - openspec/changes/{change_name}/proposal.md
+  - openspec/changes/{change_name}/design.md
+  - openspec/changes/{change_name}/tasks.md
+  - openspec/changes/{change_name}/specs/
+  required_skills: propose
+  context_files:
+    agents_md: .claude/stages/propose/AGENTS.md
+    checklist_md: .claude/stages/propose/CHECKLIST.md
+    skills_md: .claude/stages/propose/SKILLS.md
+    prompt_md: .claude/stages/propose/PROMPT.md
+  next_stage: split
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - tdd-development-plan
+    exit:
+    - check: artifact_exists
+      args:
+      - openspec/changes/{change_name}/proposal.md
+    - check: artifact_exists
+      args:
+      - openspec/changes/{change_name}/design.md
+    - check: artifact_exists
+      args:
+      - openspec/changes/{change_name}/tasks.md
+    - check: artifact_exists
+      args:
+      - openspec/changes/{change_name}/specs/
+- id: split
+  name: Split
+  description: 'Breaks OpenSpec tasks into parallel, independently implementable
+
+    GitHub Issues with clear boundaries and acceptance criteria.
+
+    '
+  human_gate: false
+  template: all
+  prerequisite_stage: propose
+  required_artifacts:
+  - .github/linked-issues.yaml
+  required_skills: split
+  context_files:
+    agents_md: .claude/stages/split/AGENTS.md
+    checklist_md: .claude/stages/split/CHECKLIST.md
+    skills_md: .claude/stages/split/SKILLS.md
+    prompt_md: .claude/stages/split/PROMPT.md
+  next_stage: implement
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - propose
+    exit:
+    - check: artifact_exists
+      args:
+      - .github/linked-issues.yaml
+- id: implement
+  name: Implement
+  description: 'Core implementation stage. Engineering executes tasks with TDD
+
+    discipline, code review, and PR submission. Lincoln pauses here
+
+    for human engineering work; test/verify and ship occur within
+
+    this stage or as follow-up PR lifecycle steps.
+
+    '
+  human_gate: true
+  template: all
+  prerequisite_stage: split
+  required_artifacts: []
+  required_skills: implement
+  context_files:
+    agents_md: .claude/stages/implement/AGENTS.md
+    checklist_md: .claude/stages/implement/CHECKLIST.md
+    skills_md: .claude/stages/implement/SKILLS.md
+    prompt_md: .claude/stages/implement/PROMPT.md
+  next_stage: sync-knowledge
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - split
+    exit:
+    - check: human_approved
+    - check: gate_review_passed
+- id: sync-knowledge
+  name: Sync Knowledge
+  description: 'After PR merge, updates Obsidian vault and archives milestone
+
+    artifacts, generating feature docs, decision docs, and interview
+
+    summaries.
+
+    '
+  human_gate: false
+  template: all
+  prerequisite_stage: implement
+  required_artifacts:
+  - .github/lincoln-sync-queue/pr-{pr_number}.yaml
+  - docs/knowledge/01-interviews/{session_id}.md
+  - docs/knowledge/02-requirements/{requirement_id}.md
+  - docs/knowledge/03-features/{feature_slug}.md
+  - docs/knowledge/04-decisions/{decision_id}.md
+  required_skills: sync-knowledge
+  context_files:
+    agents_md: .claude/stages/sync-knowledge/AGENTS.md
+    checklist_md: .claude/stages/sync-knowledge/CHECKLIST.md
+    skills_md: .claude/stages/sync-knowledge/SKILLS.md
+    prompt_md: .claude/stages/sync-knowledge/PROMPT.md
+  next_stage: null
+  gates:
+    entry:
+    - check: previous_gate_passed
+      args:
+      - implement
+    exit:
+    - check: artifact_exists
+      args:
+      - .github/lincoln-sync-queue/pr-{pr_number}.yaml
+    - check: artifact_exists
+      args:
+      - docs/knowledge/01-interviews/{session_id}.md
+    - check: artifact_exists
+      args:
+      - docs/knowledge/02-requirements/{requirement_id}.md
+    - check: artifact_exists
+      args:
+      - docs/knowledge/03-features/{feature_slug}.md
+    - check: artifact_exists
+      args:
+      - docs/knowledge/04-decisions/{decision_id}.md

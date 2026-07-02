@@ -6,7 +6,7 @@
 - [ ] 需求文档包含批准标记（`<!-- status: approved -->` 或 `[x] PM 已确认需求`）
 - [ ] `requirements/<session_id>/user-stories.md` 存在且非空
 - [ ] `requirements/<session_id>/prd.md` 存在且非空
-- [ ] 校验命令通过：`python .claude/skills/interview-workflow/validators/validate.py --phase entry --check requirements_approved --args <session_id>`
+- [ ] 校验命令通过：`python scripts/validate_stage.py --phase entry --check requirements_approved --args <session_id>`
 
 ## 执行中检查
 
@@ -36,7 +36,7 @@
 - [ ] `feature-catalog.md` 包含验收标准映射（"验收" 或 "Acceptance" 标题）
 - [ ] `data-model.md` 包含字段或约束描述（"字段"/"Field" 或 "约束"/"Constraint" 标题）
 - [ ] `feasibility.md` 包含业务可行性、技术可行性、开源项目/技术框架章节
-- [ ] 校验命令通过：`python .claude/skills/interview-workflow/validators/validate.py --phase exit --check design_docs_complete --args <design_id>`
+- [ ] 校验命令通过：`python scripts/validate_stage.py --phase exit --check design_docs_complete --args <design_id>`
 
 ## 产物验证
 
@@ -49,7 +49,7 @@
 - [ ] 人类 PM 已审阅 `design-review.md`
 - [ ] PM 确认设计文档满足需求
 - [ ] `design-review.md` 已添加 `<!-- status: approved -->` 或 `[x] PM 已确认设计文档`
-- [ ] 校验命令通过：`python .claude/skills/interview-workflow/validators/validate.py --phase exit --check design_docs_human_approved --args <design_id>`
+- [ ] 校验命令通过：`python scripts/validate_stage.py --phase exit --check design_docs_human_approved --args <design_id>`
 
 ## 状态文件更新
 

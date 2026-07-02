@@ -2,7 +2,10 @@
 set -euo pipefail
 
 # On-stop hook for Lincoln workflow.
-# Updates last_updated_at in the workflow state file when a session ends.
+# Updates last_updated_at in the workflow stage file when a session ends.
+#
+# The state file is branch-scoped: .claude/workflow-stage.yaml
+# (falls back to legacy .claude/workflow-state.yaml if present).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -15,7 +18,12 @@ else
     PYTHON="python3"
 fi
 
-STATE_FILE="${LINCOLN_STATE_FILE:-$ROOT/.claude/workflow-state.yaml}"
+STATE_FILE="${LINCOLN_STATE_FILE:-$ROOT/.claude/workflow-stage.yaml}"
+LEGACY_STATE_FILE="$ROOT/.claude/workflow-state.yaml"
+
+if [[ ! -f "$STATE_FILE" && -f "$LEGACY_STATE_FILE" ]]; then
+    STATE_FILE="$LEGACY_STATE_FILE"
+fi
 
 if [[ ! -f "$STATE_FILE" ]]; then
     exit 0

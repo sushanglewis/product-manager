@@ -58,7 +58,7 @@
 
 ## 继承规则
 
-本文件继承 `.claude/AGENTS.md` 中的核心原则：
+本文件继承 `.claude/agents/default.md` 中的核心原则：
 - 工作流优先
 - 产物可追溯（OpenSpec artifact 必须引用 TDD 计划、Pencil 原型和核心设计文档）
 - 不修改原始设计产物
@@ -69,6 +69,6 @@
 
 **产物目录**: `openspec/changes/{change_name}/`
 **校验命令**:
-- 准入: `python .claude/skills/interview-workflow/validators/validate.py --phase entry --check tdd_plan_ready --args {design_id}`
-- 退出: `python .claude/skills/interview-workflow/validators/validate.py --phase exit --check openspec_artifact_complete --args {change_name},{design_id}`
-- 退出: `python .claude/skills/interview-workflow/validators/validate.py --phase exit --check tasks_extracted --args {change_name}`
+- 准入: `python scripts/validate_stage.py --phase entry --check tdd_plan_ready --args {design_id}`
+- 退出: `python scripts/validate_stage.py --phase exit --check openspec_artifact_complete --args {change_name},{design_id}`
+- 退出: `python scripts/validate_stage.py --phase exit --check tasks_extracted --args {change_name}`

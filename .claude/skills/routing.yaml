@@ -1,0 +1,196 @@
+---
+schema_version: 1.0.0
+description: |
+  Machine-readable skill routing table for the Lincoln workflow framework.
+  Maps each Lincoln stage to required and optional skills, human gate flags,
+  and stage notes. Consumed by SKILLS.md files, stage_loader.py, and
+  lincoln-status.py.
+
+  Skill namespaces:
+  - superpowers:   Claude Superpowers methodology skills
+  - gsd:           GSD (Get Shit Done) project lifecycle skills
+  - openspec:      OpenSpec change proposal and management
+  - oh-my-claudecode: OMC multi-agent orchestration and enhancement modes
+  - lincoln:       Lincoln-native inline skills
+
+routing:
+  workflow-router:
+    required:
+      - superpowers:bootstrap
+    optional:
+      - gsd:new-project
+      - gsd:new-milestone
+      - oh-my-claudecode:plan
+    human_gate: true
+    notes: |
+      Entry point. Assesses repository context and selects the most
+      appropriate workflow template. Bootstrap is mandatory for
+      environment awareness and skill discovery.
+
+  ingest:
+    required: []
+    optional:
+      - oh-my-claudecode:deep-interview
+    human_gate: false
+    notes: |
+      Ingests raw inputs (interview recordings, documents, notes).
+      Deep-interview skill assists when structured stakeholder input
+      is available. No mandatory skills; basic file I/O suffices.
+
+  clarify:
+    required:
+      - superpowers:brainstorming
+    optional:
+      - gsd:import
+      - gsd:discuss-phase
+      - oh-my-claudecode:deep-interview
+      - openspec:explore
+    human_gate: true
+    notes: |
+      Explores requirements and clarifies ambiguity before design.
+      Brainstorming is mandatory for multi-perspective exploration.
+      Human gate ensures PM confirms direction before proceeding.
+
+  product-design-docs:
+    required:
+      - superpowers:brainstorming
+      - superpowers:writing-plans
+    optional:
+      - gsd:spec-phase
+      - oh-my-claudecode:plan
+      - openspec:propose
+    human_gate: true
+    notes: |
+      Produces design-review.md, prd.md, and related design artifacts.
+      Brainstorming for design-space exploration; writing-plans for
+      structured document output. openspec:propose may be used for
+      early-draft change proposals when the design is already concrete.
+
+  product-prototype:
+    required:
+      - superpowers:brainstorming
+    optional:
+      - gsd:ui-phase
+      - superpowers:using-git-worktrees
+      - oh-my-claudecode:designer
+    human_gate: true
+    notes: |
+      Generates UI specs, field specs, and Pencil prototypes.
+      Brainstorming for visual/UX exploration. Git worktrees for
+      isolated prototype branches. Human gate ensures PM approves
+      prototype before engineering planning.
+
+  tdd-development-plan:
+    required:
+      - superpowers:writing-plans
+      - superpowers:test-driven-development
+    optional:
+      - gsd:plan-phase
+      - gsd:mvp-phase
+      - oh-my-claudecode:plan
+    human_gate: false
+    notes: |
+      Produces tdd-plan.md with red/green/refactor sequences.
+      Writing-plans for structured planning; TDD skill enforces
+      test-first discipline. No human gate — plan is reviewed in
+      the propose stage.
+
+  propose:
+    required:
+      - openspec:propose
+    optional:
+      - superpowers:verification-before-completion
+      - oh-my-claudecode:verify
+    human_gate: false
+    notes: |
+      Generates a complete OpenSpec change proposal (proposal.md,
+      design.md, tasks.md, specs/). Verification skills ensure
+      proposal completeness before submission. No human gate —
+      approval happens in split or implement.
+
+  split:
+    required:
+      - superpowers:dispatching-parallel-agents
+    optional:
+      - gsd:phase
+      - oh-my-claudecode:team
+    human_gate: false
+    notes: |
+      Breaks the change into parallel, independently implementable
+      tasks. Dispatching-parallel-agents is mandatory for task
+      decomposition. Team skill enables multi-agent execution.
+
+  implement:
+    required:
+      - superpowers:test-driven-development
+      - superpowers:verification-before-completion
+    optional:
+      - openspec:apply-change
+      - superpowers:subagent-driven-development
+      - superpowers:using-git-worktrees
+      - superpowers:systematic-debugging
+      - superpowers:finishing-a-development-branch
+      - superpowers:requesting-code-review
+      - superpowers:receiving-code-review
+      - gsd:execute-phase
+      - gsd:code-review
+      - gsd:debug
+      - oh-my-claudecode:team
+      - oh-my-claudecode:autopilot
+      - oh-my-claudecode:ralph
+      - oh-my-claudecode:ultrawork
+    human_gate: true
+    notes: |
+      Core implementation stage. TDD and verification are mandatory.
+      Rich optional skill set covers subagent execution, git
+      worktrees, debugging, code review, and OMC enhancement
+      modes (team, autopilot, ralph, ultrawork). Human gate for
+      code review and final approval before test/verify.
+
+  test/verify:
+    required:
+      - superpowers:verification-before-completion
+      - superpowers:receiving-code-review
+    optional:
+      - gsd:verify-work
+      - gsd:audit-uat
+      - gsd:eval-review
+      - oh-my-claudecode:verify
+      - oh-my-claudecode:ultraqa
+    human_gate: false
+    notes: |
+      Validates implementation against acceptance criteria and
+      conducts code review. Verification and receiving-code-review
+      are mandatory. GSD verify-work and audit-uat for conversational
+      UAT. No human gate — results feed into ship stage.
+
+  ship:
+    required:
+      - superpowers:finishing-a-development-branch
+    optional:
+      - openspec:archive-change
+      - gsd:ship
+      - oh-my-claudecode:release
+    human_gate: false
+    notes: |
+      Finalizes branch, creates PR, and prepares for merge.
+      Finishing-a-development-branch is mandatory. Archive-change
+      for OpenSpec workflow closure. No human gate — PR review is
+      the human checkpoint.
+
+  sync-knowledge:
+    required:
+      - gsd:docs-update
+    optional:
+      - gsd:forensics
+      - gsd:milestone-summary
+      - openspec:sync-specs
+      - oh-my-claudecode:wiki
+      - oh-my-claudecode:writer-memory
+      - superpowers:verification-before-completion
+    human_gate: false
+    notes: |
+      Updates project documentation, syncs specs, and archives
+      milestone artifacts. Docs-update is mandatory. Forensics and
+      milestone-summary for post-mortem and summary generation.
+      Wiki and writer-memory for knowledge persistence.

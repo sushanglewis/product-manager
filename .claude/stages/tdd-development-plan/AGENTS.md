@@ -54,7 +54,7 @@
 
 ## 继承规则
 
-本文件继承 `.claude/AGENTS.md` 中的核心原则：
+本文件继承 `.claude/agents/default.md` 中的核心原则：
 - 工作流优先
 - 产物可追溯（每个测试场景映射回设计文档和验收标准）
 - 不修改原始设计产物
@@ -65,5 +65,5 @@
 
 **产物文件**: `designs/{design_id}/tdd-plan.md`
 **校验命令**:
-- 准入: `python .claude/skills/interview-workflow/validators/validate.py --phase entry --check prototype_ready --args {design_id}`
-- 退出: `python .claude/skills/interview-workflow/validators/validate.py --phase exit --check tdd_plan_complete --args {design_id}`
+- 准入: `python scripts/validate_stage.py --phase entry --check prototype_ready --args {design_id}`
+- 退出: `python scripts/validate_stage.py --phase exit --check tdd_plan_complete --args {design_id}`

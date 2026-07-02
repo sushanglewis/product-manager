@@ -121,6 +121,19 @@
             { "type": "null" }
           ],
           "description": "The stage that follows this one, or null for terminal stages"
+        },
+        "gates": {
+          "type": "object",
+          "properties": {
+            "entry": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/gateCheck" }
+            },
+            "exit": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/gateCheck" }
+            }
+          }
         }
       },
       "additionalProperties": false
@@ -178,6 +191,25 @@
         "CHECKLIST.md": { "type": "string", "const": "exists" },
         "SKILLS.md": { "type": "string", "const": "exists" },
         "PROMPT.md": { "type": "string", "const": "exists" }
+      }
+    },
+    "gateCheck": {
+      "type": "object",
+      "required": ["check"],
+      "properties": {
+        "check": {
+          "type": "string",
+          "enum": [
+            "artifact_exists",
+            "human_approved",
+            "gate_review_passed",
+            "previous_gate_passed"
+          ]
+        },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
       }
     }
   }

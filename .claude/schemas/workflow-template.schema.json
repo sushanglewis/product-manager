@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://lincoln-framework.dev/schemas/workflow-template.schema.json",
+  "title": "Lincoln Workflow Template Schema",
+  "description": "Validates workflow template YAML files under .claude/workflows/.",
+  "type": "object",
+  "required": ["workflow"],
+  "properties": {
+    "workflow": {
+      "type": "object",
+      "required": ["name", "version", "description", "steps"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "description": { "type": "string" },
+        "loop": {
+          "type": "object",
+          "properties": {
+            "engine": { "type": "string" },
+            "state_file": { "type": "string" },
+            "on_failure": { "type": "string" },
+            "max_retries": { "type": "integer" }
+          }
+        },
+        "conventions": {
+          "type": "object",
+          "properties": {
+            "language": { "type": "string" },
+            "artifact_encoding": { "type": "string" },
+            "timestamp_format": { "type": "string" },
+            "session_id_pattern": { "type": "string" }
+          }
+        },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/step" }
+        },
+        "gates": {
+          "type": "object",
+          "properties": {
+            "human_confirmation_prompt": { "type": "string" },
+            "on_validation_failure": { "type": "string" },
+            "on_human_rejection": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "step": {
+      "type": "object",
+      "required": ["id", "name", "description"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "entry_checks": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/check" }
+        },
+        "exit_checks": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/check" }
+        },
+        "action": { "type": "string" },
+        "human_gate": { "type": "boolean" },
+        "artifacts": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "trigger": { "type": "string" }
+      }
+    },
+    "check": {
+      "type": "object",
+      "required": ["check"],
+      "properties": {
+        "check": { "type": "string" },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

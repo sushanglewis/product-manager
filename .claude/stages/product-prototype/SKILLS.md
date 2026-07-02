@@ -2,7 +2,7 @@
 
 ## 技能路由
 
-本阶段技能路由定义见 `.claude/skill-routing.yaml`：
+本阶段技能路由定义见 `.claude/skills/routing.yaml`：
 - **required**: `superpowers:brainstorming`
 - **optional**: `gsd:ui-phase`, `superpowers:using-git-worktrees`, `oh-my-claudecode:designer`
 - **human_gate**: 是
@@ -14,7 +14,7 @@
   - 参数：
     - `session_id`: 访谈会话 ID，如 `2026-06-27-stakeholder`
     - `design_id`: 产品设计 ID（kebab-case），如 `checkout-redesign`
-  - 完整 prompt 文件：`.claude/skills/interview-workflow/prompts/build-product-prototype.md`
+  - 完整 prompt 文件：`.claude/skills/build-product-prototype/prompts/main.md`
 
 ## 辅助技能
 
@@ -30,8 +30,8 @@
 
 ## 校验器使用
 
-- 入口校验：`python .claude/skills/interview-workflow/validators/validate.py --phase entry --check product_design_approved --args <design_id>`
-- 出口校验：`python .claude/skills/interview-workflow/validators/validate.py --phase exit --check prototype_artifact_complete --args <design_id>`
+- 入口校验：`python scripts/validate_stage.py --phase entry --check product_design_approved --args <design_id>`
+- 出口校验：`python scripts/validate_stage.py --phase exit --check prototype_artifact_complete --args <design_id>`
 - 校验失败时：停止 loop、报告失败项、给出修复建议、等待人类处理
 
 ## MCP 工具

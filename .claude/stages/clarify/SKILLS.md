@@ -2,7 +2,7 @@
 
 ## 技能路由
 
-本阶段技能路由定义见 `.claude/skill-routing.yaml`：
+本阶段技能路由定义见 `.claude/skills/routing.yaml`：
 - **required**: `superpowers:brainstorming`
 - **optional**: `gsd:import`, `gsd:discuss-phase`, `oh-my-claudecode:deep-interview`, `openspec:explore`
 - **human_gate**: 是
@@ -10,10 +10,10 @@
 ## 主技能命令
 
 - **命令**: `clarify-requirements`
-- **来源**: `.claude/skills/interview-workflow/skill.yaml`
+- **来源**: `.claude/skills/`
 - **参数**:
   - `session_id` (必填): 访谈会话 ID，如 `2026-06-27-stakeholder`
-- **提示文件**: `.claude/skills/interview-workflow/prompts/clarify-requirements.md`
+- **提示文件**: `.claude/skills/clarify-requirements/prompts/main.md`
 
 ## 辅助子技能
 
@@ -36,18 +36,18 @@ PM 必须输入 `confirm` 或在 `requirements.md` 中写入 `<!-- status: appro
 
 ## 校验器使用
 
-- **校验器路径**: `.claude/skills/interview-workflow/validators/validate.py`
+- **校验器路径**: `scripts/validate_stage.py`
 - **使用方式**:
   ```bash
   # 准入校验
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase entry --check summary_ready --args {session_id}
   
   # 退出校验
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase exit --check requirements_has_background_problem_solution_acceptance --args {session_id}
   
-  python .claude/skills/interview-workflow/validators/validate.py \
+  python scripts/validate_stage.py \
     --phase exit --check human_approved --args {session_id}
   ```
 

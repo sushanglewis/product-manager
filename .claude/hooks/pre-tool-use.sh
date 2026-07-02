@@ -25,7 +25,12 @@ fi
 
 TOOL_NAME="${1:-}"
 TOOL_ARGS="${2:-}"
-STATE_FILE="${LINCOLN_STATE_FILE:-$ROOT/.claude/workflow-state.yaml}"
+STATE_FILE="${LINCOLN_STATE_FILE:-$ROOT/.claude/workflow-stage.yaml}"
+LEGACY_STATE_FILE="$ROOT/.claude/workflow-state.yaml"
+
+if [[ ! -f "$STATE_FILE" && -f "$LEGACY_STATE_FILE" ]]; then
+    STATE_FILE="$LEGACY_STATE_FILE"
+fi
 
 # If state file does not exist, allow everything (not a Lincoln project or not initialized)
 if [[ ! -f "$STATE_FILE" ]]; then
@@ -40,7 +45,14 @@ import yaml
 path = sys.argv[1]
 state = yaml.safe_load(open(path, encoding="utf-8"))
 current = state.get("current_run", {}).get("current_stage") or "not_started"
-stage_state = state.get("stages", {}).get(current, {})
+# New schema: derive status from latest node; legacy schema: from stages map.
+nodes = state.get("nodes")
+if nodes:
+    stage_state = nodes[-1]
+elif "stages" in state and current in state["stages"]:
+    stage_state = state["stages"][current]
+else:
+    stage_state = {}
 status = stage_state.get("status") or "not_started"
 print(current)
 print(status)
@@ -99,6 +111,20 @@ if [[ "$STAGE_STATUS" == "paused" || "$STAGE_STATUS" == "waiting_for_human" || "
         echo "BLOCKED: Stage '$CURRENT_STAGE' is $STAGE_STATUS. Only Read/Grep/Glob allowed." >&2
         echo "To resume: run the stage's skill command or call workflow-continue." >&2
         exit 1
+    fi
+fi
+
+# Exit gate check: block side-effect tools that would advance to the next stage
+# if the current stage's exit gate has not been approved.
+if is_side_effect "$TOOL_NAME"; then
+    GATE_STATUS=$("$PYTHON" "$ROOT/scripts/stage_loader.py" \
+        --stage "$CURRENT_STAGE" \
+        --action validate-exit \
+        2>/dev/null | grep -c "^PASS:" || echo "0")
+    # For now, only warn rather than block to avoid breaking legitimate edits.
+    if [[ "$GATE_STATUS" == "0" && "$TOOL_NAME" != "Read" ]]; then
+        echo "[Lincoln] Warning: exit gate for '$CURRENT_STAGE' is not yet approved." >&2
+        echo "[Lincoln] Run 'python scripts/stage_loader.py --stage $CURRENT_STAGE --action validate-exit' to check." >&2
     fi
 fi
 

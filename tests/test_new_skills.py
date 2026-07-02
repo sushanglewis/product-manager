@@ -18,10 +18,11 @@ def test_explore_opensource_skill_exists():
     assert prompt.exists()
 
 
-def test_new_stages_registered_in_skill_yaml():
+def test_new_stages_registered_in_bundle_skill():
     root = Path(__file__).resolve().parents[1]
-    data = yaml.safe_load((root / ".claude" / "skills" / "interview-workflow" / "skill.yaml").read_text(encoding="utf-8"))
-    lincoln = data.get("skill_ecosystem", {}).get("lincoln", [])
-    assert "lincoln-build-codebase-knowledge" in lincoln
-    assert "lincoln-explore-opensource" in lincoln
-    assert "lincoln-workflow-router" in lincoln
+    skill_md = root / ".claude" / "skills" / "lincoln-workflow" / "SKILL.md"
+    assert skill_md.exists()
+    text = skill_md.read_text(encoding="utf-8").lower()
+    assert "lincoln-build-codebase-knowledge" in text
+    assert "lincoln-explore-opensource" in text
+    assert "lincoln-workflow-router" in text

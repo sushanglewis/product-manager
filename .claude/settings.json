@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": ".claude/hooks/on-session-start.sh",
+    "Stop": ".claude/hooks/on-stop.sh",
+    "PreToolUse": ".claude/hooks/pre-tool-use.sh",
+    "PostToolUse": ".claude/hooks/post-tool-use.sh"
+  },
+  "lincoln": {
+    "state_file": ".claude/workflow-stage.yaml",
+    "legacy_state_file": ".claude/workflow-state.yaml",
+    "auto_install_dependencies": false,
+    "dependency_check_on_startup": true
+  }
+}

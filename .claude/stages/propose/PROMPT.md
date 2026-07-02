@@ -16,12 +16,12 @@
 
 ## 执行指令
 
-1. **读取完整提示文件**: `.claude/skills/interview-workflow/prompts/propose-with-openspec.md`
+1. **读取完整提示文件**: `.claude/skills/propose-with-openspec/prompts/main.md`
    - 该文件包含详细的 OpenSpec CLI 调用步骤和 artifact 验证规则
    - 按照提示文件中的步骤 1-9 执行
 
 2. **阶段状态感知**:
-   - 检查 `.claude/workflow-state.yaml` 中的 `stages.propose` 状态
+   - 检查 `.claude/workflow-stage.yaml` 中的 `stages.propose` 状态
    - 若状态为 `completed`，检查是否需要重新生成（人类要求时）
    - 若状态为 `validation_failed`，根据 `error_message` 修复后重试
    - 若人类运行 `workflow-continue`，重新读取 OpenSpec artifact 并重新校验

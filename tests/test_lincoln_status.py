@@ -288,5 +288,10 @@ def test_get_required_skills_missing_file(status_mod, tmp_path, monkeypatch):
     """Test that missing skill-routing.yaml doesn't crash."""
     fake_routing = tmp_path / "skill-routing.yaml"
     monkeypatch.setattr(status_mod, "SKILL_ROUTING_PATH", fake_routing)
+    monkeypatch.setattr(status_mod, "LEGACY_SKILL_ROUTING_PATH", fake_routing)
+    # Also patch stage_loader's constants since get_required_skills delegates there.
+    stage_loader_mod = sys.modules[status_mod.load_skill_routing.__module__]
+    monkeypatch.setattr(stage_loader_mod, "SKILL_ROUTING_PATH", fake_routing)
+    monkeypatch.setattr(stage_loader_mod, "LEGACY_SKILL_ROUTING_PATH", fake_routing)
     skills = status_mod.get_required_skills("clarify")
     assert skills == {"required": [], "optional": []}

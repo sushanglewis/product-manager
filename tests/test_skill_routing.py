@@ -5,7 +5,7 @@ import pytest
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILL_ROUTING_PATH = ROOT / ".claude" / "skill-routing.yaml"
+SKILL_ROUTING_PATH = ROOT / ".claude" / "skills" / "routing.yaml"
 WORKFLOW_PATH = ROOT / ".claude" / "workflows" / "interview-to-knowledge.yaml"
 
 VALID_NAMESPACES = {
