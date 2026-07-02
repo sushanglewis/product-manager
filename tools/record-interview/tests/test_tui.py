@@ -48,8 +48,12 @@ async def test_setup_screen_requests_microphone_permission_when_missing(app, moc
     mocker.patch("record_interview.checks.check_diarization", return_value=(True, "ok"))
     mocker.patch("record_interview.checks.check_summarization", return_value=(True, "ok"))
     mocker.patch("record_interview.checks.check_microphone", return_value=(False, "no microphone"))
-    request_spy = mocker.patch("record_interview.tui.screens.setup.request_microphone_permission", return_value=False)
+    request_spy = mocker.patch(
+        "record_interview.tui.screens.setup._request_microphone_permission_with_reason",
+        return_value=(False, "denied"),
+    )
     app.app.screen._requested_permission = False
     app.app.screen._run_checks()
     await app.pause()
     request_spy.assert_called_once()
+    assert "denied" in app.app.screen._checks["microphone"][1]

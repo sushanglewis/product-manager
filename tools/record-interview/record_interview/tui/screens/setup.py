@@ -7,7 +7,10 @@ from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
 from textual.widgets import Button, Static
 
-from record_interview.checks import request_microphone_permission, run_setup_checks
+from record_interview.checks import (
+    _request_microphone_permission_with_reason,
+    run_setup_checks,
+)
 from record_interview.metadata import build_metadata, write_metadata
 
 
@@ -44,11 +47,19 @@ class SetupScreen(Screen):
 
     async def _request_permission_and_recheck(self) -> None:
         try:
-            granted = await asyncio.to_thread(request_microphone_permission)
+            granted, reason = await asyncio.to_thread(
+                _request_microphone_permission_with_reason
+            )
         except Exception:  # noqa: BLE001
-            granted = False
+            granted, reason = False, "unexpected error"
         if granted:
             self._checks = run_setup_checks(self.app.config)
+        else:
+            self._checks["microphone"] = (
+                False,
+                f"microphone permission: {reason}. "
+                "If denied, reset with: tccutil reset Microphone",
+            )
         self._render_checks()
 
     def _render_checks(self) -> None:

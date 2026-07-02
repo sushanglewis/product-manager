@@ -1,4 +1,5 @@
 from record_interview.checks import (
+    _request_microphone_permission_with_reason,
     check_diarization,
     check_ffmpeg,
     check_microphone,
@@ -230,3 +231,49 @@ def test_request_microphone_permission_swallows_avfoundation_errors(mocker):
         {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
     )
     assert request_microphone_permission() is False
+
+
+def test_reason_non_macos(mocker):
+    mocker.patch("platform.system", return_value="Linux")
+    granted, reason = _request_microphone_permission_with_reason()
+    assert granted is False
+    assert reason == "not macOS"
+
+
+def test_reason_import_error(mocker):
+    mocker.patch("platform.system", return_value="Darwin")
+    mocker.patch.dict("sys.modules", {"AVFoundation": None}, clear=False)
+    granted, reason = _request_microphone_permission_with_reason()
+    assert granted is False
+    assert "AVFoundation not available" in reason
+
+
+def test_reason_denied(mocker):
+    mocker.patch("platform.system", return_value="Darwin")
+    device_cls = mocker.MagicMock()
+    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=2)
+    mocker.patch.dict(
+        "sys.modules",
+        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
+    )
+    granted, reason = _request_microphone_permission_with_reason()
+    assert granted is False
+    assert reason == "denied"
+
+
+def test_reason_granted(mocker):
+    mocker.patch("platform.system", return_value="Darwin")
+    device_cls = mocker.MagicMock()
+    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=0)
+
+    def _request_access(media_type, completion):
+        completion(True)
+
+    device_cls.requestAccessForMediaType_completionHandler_ = mocker.MagicMock(side_effect=_request_access)
+    mocker.patch.dict(
+        "sys.modules",
+        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
+    )
+    granted, reason = _request_microphone_permission_with_reason(timeout_seconds=1.0)
+    assert granted is True
+    assert reason == "granted"

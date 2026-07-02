@@ -28,22 +28,30 @@ def request_microphone_permission(timeout_seconds: float = 30.0) -> bool:
 
     On non-macOS platforms this returns False immediately.
     """
+    granted, _reason = _request_microphone_permission_with_reason(timeout_seconds)
+    return granted
+
+
+def _request_microphone_permission_with_reason(
+    timeout_seconds: float = 30.0,
+) -> tuple[bool, str]:
+    """Request macOS microphone permission and return (granted, reason)."""
     if platform.system() != "Darwin":
-        return False
+        return False, "not macOS"
     try:
         from AVFoundation import (  # type: ignore[import-untyped]
             AVCaptureDevice,
             AVMediaTypeAudio,
         )
     except ImportError:
-        return False
+        return False, "AVFoundation not available (pyobjc missing)"
 
     try:
         status = AVCaptureDevice.authorizationStatusForMediaType_(AVMediaTypeAudio)
         if status == _AV_AUTHORIZATION_AUTHORIZED:
-            return True
+            return True, "already authorized"
         if status == _AV_AUTHORIZATION_DENIED:
-            return False
+            return False, "denied"
 
         event = threading.Event()
         granted = False
@@ -58,10 +66,12 @@ def request_microphone_permission(timeout_seconds: float = 30.0) -> bool:
         AVCaptureDevice.requestAccessForMediaType_completionHandler_(
             AVMediaTypeAudio, completion
         )
-        return event.wait(timeout=timeout_seconds) and granted
+        if event.wait(timeout=timeout_seconds) and granted:
+            return True, "granted"
+        return False, "timed out"
     except Exception as exc:  # noqa: BLE001
         _LOGGER.warning("Failed to request microphone permission: %s", exc)
-        return False
+        return False, f"error: {exc}"
 
 
 def _list_avfoundation_devices() -> str:
