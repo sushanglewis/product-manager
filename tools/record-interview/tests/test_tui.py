@@ -6,6 +6,16 @@ from record_interview.tui.app import LincolnRecordApp
 from record_interview.tui.screens.recording import RecordingScreen
 
 
+@pytest.fixture(autouse=True)
+def _patch_microphone_permission(mocker):
+    # Prevent the TUI setup screen from running a real ffmpeg permission probe
+    # during tests.
+    mocker.patch(
+        "record_interview.tui.screens.setup._request_microphone_permission_with_reason",
+        return_value=(True, "granted"),
+    )
+
+
 @pytest_asyncio.fixture
 async def app(tmp_path):
     (tmp_path / "recordings").mkdir()

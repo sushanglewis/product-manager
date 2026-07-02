@@ -1,3 +1,5 @@
+import subprocess
+
 from record_interview.checks import (
     _request_microphone_permission_with_reason,
     check_diarization,
@@ -167,68 +169,48 @@ def test_request_microphone_permission_non_macos(mocker):
     assert request_microphone_permission() is False
 
 
-def test_request_microphone_permission_import_error_on_macos(mocker):
+def test_request_microphone_permission_missing_ffmpeg(mocker):
     mocker.patch("platform.system", return_value="Darwin")
-    mocker.patch.dict("sys.modules", {"AVFoundation": None}, clear=False)
+    mocker.patch("shutil.which", return_value=None)
     assert request_microphone_permission() is False
 
 
-def test_request_microphone_permission_already_authorized_on_macos(mocker):
+def test_request_microphone_permission_granted(mocker):
     mocker.patch("platform.system", return_value="Darwin")
-    device_cls = mocker.MagicMock()
-    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=3)
-    mocker.patch.dict(
-        "sys.modules",
-        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
-    )
+    mocker.patch("shutil.which", return_value="/usr/bin/ffmpeg")
+    result = mocker.MagicMock()
+    result.returncode = 0
+    result.stderr = b""
+    mocker.patch("record_interview.checks.subprocess.run", return_value=result)
     assert request_microphone_permission() is True
 
 
-def test_request_microphone_permission_restricted_on_macos(mocker):
+def test_request_microphone_permission_denied(mocker):
     mocker.patch("platform.system", return_value="Darwin")
-    device_cls = mocker.MagicMock()
-    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=1)
-    mocker.patch.dict(
-        "sys.modules",
-        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
-    )
+    mocker.patch("shutil.which", return_value="/usr/bin/ffmpeg")
+    result = mocker.MagicMock()
+    result.returncode = 1
+    result.stderr = b"Permission denied by user"
+    mocker.patch("record_interview.checks.subprocess.run", return_value=result)
     assert request_microphone_permission() is False
 
 
-def test_request_microphone_permission_granted_after_request_on_macos(mocker):
+def test_request_microphone_permission_times_out(mocker):
     mocker.patch("platform.system", return_value="Darwin")
-    device_cls = mocker.MagicMock()
-    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=0)
-
-    def _request_access(media_type, completion):
-        completion(True)
-
-    device_cls.requestAccessForMediaType_completionHandler_ = mocker.MagicMock(side_effect=_request_access)
-    mocker.patch.dict(
-        "sys.modules",
-        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
-    )
-    assert request_microphone_permission(timeout_seconds=1.0) is True
-
-
-def test_request_microphone_permission_times_out_when_no_completion_on_macos(mocker):
-    mocker.patch("platform.system", return_value="Darwin")
-    device_cls = mocker.MagicMock()
-    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=0)
-    mocker.patch.dict(
-        "sys.modules",
-        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
+    mocker.patch("shutil.which", return_value="/usr/bin/ffmpeg")
+    mocker.patch(
+        "record_interview.checks.subprocess.run",
+        side_effect=subprocess.TimeoutExpired("ffmpeg", 60),
     )
     assert request_microphone_permission(timeout_seconds=0.01) is False
 
 
-def test_request_microphone_permission_swallows_avfoundation_errors(mocker):
+def test_request_microphone_permission_handles_subprocess_error(mocker):
     mocker.patch("platform.system", return_value="Darwin")
-    device_cls = mocker.MagicMock()
-    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(side_effect=RuntimeError("boom"))
-    mocker.patch.dict(
-        "sys.modules",
-        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
+    mocker.patch("shutil.which", return_value="/usr/bin/ffmpeg")
+    mocker.patch(
+        "record_interview.checks.subprocess.run",
+        side_effect=FileNotFoundError("ffmpeg"),
     )
     assert request_microphone_permission() is False
 
@@ -240,40 +222,33 @@ def test_reason_non_macos(mocker):
     assert reason == "not macOS"
 
 
-def test_reason_import_error(mocker):
+def test_reason_missing_ffmpeg(mocker):
     mocker.patch("platform.system", return_value="Darwin")
-    mocker.patch.dict("sys.modules", {"AVFoundation": None}, clear=False)
+    mocker.patch("shutil.which", return_value=None)
     granted, reason = _request_microphone_permission_with_reason()
     assert granted is False
-    assert "AVFoundation not available" in reason
-
-
-def test_reason_denied(mocker):
-    mocker.patch("platform.system", return_value="Darwin")
-    device_cls = mocker.MagicMock()
-    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=2)
-    mocker.patch.dict(
-        "sys.modules",
-        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
-    )
-    granted, reason = _request_microphone_permission_with_reason()
-    assert granted is False
-    assert reason == "denied"
+    assert reason == "ffmpeg missing"
 
 
 def test_reason_granted(mocker):
     mocker.patch("platform.system", return_value="Darwin")
-    device_cls = mocker.MagicMock()
-    device_cls.authorizationStatusForMediaType_ = mocker.MagicMock(return_value=0)
-
-    def _request_access(media_type, completion):
-        completion(True)
-
-    device_cls.requestAccessForMediaType_completionHandler_ = mocker.MagicMock(side_effect=_request_access)
-    mocker.patch.dict(
-        "sys.modules",
-        {"AVFoundation": mocker.MagicMock(AVCaptureDevice=device_cls, AVMediaTypeAudio="audio")},
-    )
-    granted, reason = _request_microphone_permission_with_reason(timeout_seconds=1.0)
+    mocker.patch("shutil.which", return_value="/usr/bin/ffmpeg")
+    result = mocker.MagicMock()
+    result.returncode = 0
+    result.stderr = b""
+    mocker.patch("record_interview.checks.subprocess.run", return_value=result)
+    granted, reason = _request_microphone_permission_with_reason()
     assert granted is True
     assert reason == "granted"
+
+
+def test_reason_failed(mocker):
+    mocker.patch("platform.system", return_value="Darwin")
+    mocker.patch("shutil.which", return_value="/usr/bin/ffmpeg")
+    result = mocker.MagicMock()
+    result.returncode = 1
+    result.stderr = b"first line\nlast line\n"
+    mocker.patch("record_interview.checks.subprocess.run", return_value=result)
+    granted, reason = _request_microphone_permission_with_reason()
+    assert granted is False
+    assert "last line" in reason

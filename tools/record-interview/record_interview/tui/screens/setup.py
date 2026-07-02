@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
@@ -41,25 +39,18 @@ class SetupScreen(Screen):
             self._requested_permission = True
             status = self.query_one("#status", Static)
             status.update("Requesting microphone permission...")
-            asyncio.create_task(self._request_permission_and_recheck())
-            return
-        self._render_checks()
-
-    async def _request_permission_and_recheck(self) -> None:
-        try:
-            granted, reason = await asyncio.to_thread(
-                _request_microphone_permission_with_reason
-            )
-        except Exception:  # noqa: BLE001
-            granted, reason = False, "unexpected error"
-        if granted:
-            self._checks = run_setup_checks(self.app.config)
-        else:
-            self._checks["microphone"] = (
-                False,
-                f"microphone permission: {reason}. "
-                "If denied, reset with: tccutil reset Microphone",
-            )
+            try:
+                granted, reason = _request_microphone_permission_with_reason()
+            except Exception:  # noqa: BLE001
+                granted, reason = False, "unexpected error"
+            if granted:
+                self._checks = run_setup_checks(app.config)
+            else:
+                self._checks["microphone"] = (
+                    False,
+                    f"microphone permission: {reason}. "
+                    "If denied, reset with: tccutil reset Microphone",
+                )
         self._render_checks()
 
     def _render_checks(self) -> None:

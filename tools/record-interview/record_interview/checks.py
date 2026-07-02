@@ -4,17 +4,10 @@ import logging
 import platform
 import shutil
 import subprocess
-import threading
 
 from record_interview.config import Config
 
 _LOGGER = logging.getLogger(__name__)
-
-# AVAuthorizationStatus raw values on macOS / iOS.
-_AV_AUTHORIZATION_NOT_DETERMINED = 0
-_AV_AUTHORIZATION_RESTRICTED = 1
-_AV_AUTHORIZATION_DENIED = 2
-_AV_AUTHORIZATION_AUTHORIZED = 3
 
 
 def check_ffmpeg() -> tuple[bool, str]:
@@ -23,55 +16,58 @@ def check_ffmpeg() -> tuple[bool, str]:
     return False, "ffmpeg not found in PATH. Install with: brew install ffmpeg"
 
 
-def request_microphone_permission(timeout_seconds: float = 30.0) -> bool:
+def request_microphone_permission(timeout_seconds: float = 60.0) -> bool:
     """Request macOS microphone permission and return whether it was granted.
 
-    On non-macOS platforms this returns False immediately.
+    On macOS this runs a short ffmpeg capture to trigger the system permission
+    dialog. On non-macOS platforms this returns False immediately.
     """
     granted, _reason = _request_microphone_permission_with_reason(timeout_seconds)
     return granted
 
 
 def _request_microphone_permission_with_reason(
-    timeout_seconds: float = 30.0,
+    timeout_seconds: float = 60.0,
 ) -> tuple[bool, str]:
     """Request macOS microphone permission and return (granted, reason)."""
     if platform.system() != "Darwin":
         return False, "not macOS"
+    if not shutil.which("ffmpeg"):
+        return False, "ffmpeg missing"
+
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-f",
+        "avfoundation",
+        "-i",
+        ":default",
+        "-t",
+        "0.1",
+        "-f",
+        "null",
+        "-",
+    ]
     try:
-        from AVFoundation import (  # type: ignore[import-untyped]
-            AVCaptureDevice,
-            AVMediaTypeAudio,
+        result = subprocess.run(
+            cmd,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            timeout=timeout_seconds,
         )
-    except ImportError:
-        return False, "AVFoundation not available (pyobjc missing)"
-
-    try:
-        status = AVCaptureDevice.authorizationStatusForMediaType_(AVMediaTypeAudio)
-        if status == _AV_AUTHORIZATION_AUTHORIZED:
-            return True, "already authorized"
-        if status == _AV_AUTHORIZATION_DENIED:
-            return False, "denied"
-
-        event = threading.Event()
-        granted = False
-
-        def completion(is_granted: bool) -> None:
-            nonlocal granted
-            if event.is_set():
-                return
-            granted = is_granted
-            event.set()
-
-        AVCaptureDevice.requestAccessForMediaType_completionHandler_(
-            AVMediaTypeAudio, completion
-        )
-        if event.wait(timeout=timeout_seconds) and granted:
-            return True, "granted"
+    except subprocess.TimeoutExpired:
         return False, "timed out"
-    except Exception as exc:  # noqa: BLE001
-        _LOGGER.warning("Failed to request microphone permission: %s", exc)
+    except (subprocess.SubprocessError, FileNotFoundError, OSError) as exc:
         return False, f"error: {exc}"
+
+    stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
+    if result.returncode == 0:
+        return True, "granted"
+    if "permission" in stderr.lower():
+        return False, "denied"
+    _LOGGER.warning("ffmpeg permission probe failed: %s", stderr)
+    return False, f"failed: {stderr.strip().splitlines()[-1] if stderr else 'unknown'}"
 
 
 def _list_avfoundation_devices() -> str:

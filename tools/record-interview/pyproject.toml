@@ -7,7 +7,6 @@ dependencies = [
     "textual>=0.70",
     "pyyaml>=6.0",
     "faster-whisper>=1.0",
-    "pyobjc-framework-AVFoundation>=10.0; sys_platform == 'darwin'",
 ]
 
 [project.optional-dependencies]
